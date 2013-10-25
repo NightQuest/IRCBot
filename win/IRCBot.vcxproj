@@ -191,6 +191,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCBot.cpp" />
     <ClCompile Include="..\src\MariaDB\Connection.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryResult.cpp" />
@@ -208,6 +209,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Config\Config.h" />
     <ClInclude Include="..\src\MariaDB\Connection.h" />
     <ClInclude Include="..\src\MariaDB\MariaDB.h" />
     <ClInclude Include="..\src\MariaDB\QueryResult.h" />
