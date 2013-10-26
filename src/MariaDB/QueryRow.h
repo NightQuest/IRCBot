@@ -14,7 +14,7 @@ namespace MariaDB
 		QueryRow(MYSQL_ROW _row, MYSQL_FIELD* _fields, unsigned int _fieldCount, unsigned long* _columnLengths);
 		~QueryRow();
 
-		QueryRowField operator[](std::string& in) const;
+		QueryRowField operator[](const std::string& in) const;
 		QueryRowField operator[](unsigned int in) const;
 	};
 };

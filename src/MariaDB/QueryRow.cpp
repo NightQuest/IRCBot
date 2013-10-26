@@ -9,7 +9,7 @@ MariaDB::QueryRow::~QueryRow()
 {
 }
 
-MariaDB::QueryRowField MariaDB::QueryRow::operator[](std::string& in) const
+MariaDB::QueryRowField MariaDB::QueryRow::operator[](const std::string& in) const
 {
 	for(unsigned int x = 0; x < fieldCount; x++)
 	{
