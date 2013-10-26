@@ -1,0 +1,6 @@
+/bin/*
+/win/*.sdf
+/win/*.opensdf
+/win/*.suo
+/win/*.user
+/win/ipch/*
