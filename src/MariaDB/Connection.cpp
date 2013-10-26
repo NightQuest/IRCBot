@@ -41,6 +41,11 @@ void MariaDB::Connection::close()
 	}
 }
 
+bool MariaDB::Connection::ping()
+{
+	return mysql_ping(conn) == 0;
+}
+
 bool MariaDB::Connection::execute(const std::string& str)
 {
 	return mysql_query(conn, str.c_str()) == 0;
