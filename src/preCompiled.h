@@ -1,4 +1,8 @@
+#pragma once
+
 #include <iostream>
 #include <string>
+#include <memory>
+#include <vector>
 
-#include <mysql.h>
+#include "MariaDB/MariaDB.h"
