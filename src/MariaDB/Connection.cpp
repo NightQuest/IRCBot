@@ -61,12 +61,6 @@ MariaDB::QueryResult MariaDB::Connection::query(const std::string& str)
 		return nullptr;
 
 	rowCount = mysql_affected_rows(conn);
-	if( rowCount == 0 )
-	{
-		mysql_free_result(res);
-		return nullptr;
-	}
-
 	fieldCount = mysql_field_count(conn);
 	fields = mysql_fetch_fields(res);
 
