@@ -4,3 +4,5 @@
 /win/*.suo
 /win/*.user
 /win/ipch/*
+
+/win/*.conf
