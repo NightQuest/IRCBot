@@ -32,8 +32,16 @@ bool Config::load(const std::string& filename)
 			if( firstQuote != std::string::npos && lastQuote != std::string::npos )
 				value = value.substr(firstQuote+1, lastQuote-1);
 
-			std::transform(index.begin(), index.end(), index.begin(), ::tolower);
+			size_t leadingWhiteSpace = index.find_first_not_of(" \t");
+			if( leadingWhiteSpace != std::string::npos )
+				index = index.substr(leadingWhiteSpace);
 
+			size_t trailingWhiteSpace = index.find_last_not_of(" \t");
+			if( trailingWhiteSpace != std::string::npos )
+				index = index.substr(0, ++trailingWhiteSpace);
+
+
+			std::transform(index.begin(), index.end(), index.begin(), ::tolower);
 			data[index] = value;
 		}
 	}
