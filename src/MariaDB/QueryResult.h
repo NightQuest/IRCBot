@@ -21,6 +21,6 @@ namespace MariaDB
 		unsigned int getFieldCount() const { return fieldCount; }
 
 		bool nextRow();
-		QueryRow* getRow() const { return row ? row : nullptr; }
+		QueryRow* getRow() const { return row; }
 	};
 };
