@@ -6,9 +6,11 @@ namespace MariaDB
 	{
 	private:
 		MYSQL *conn;
+		bool keepAlive;
+		std::thread keepAliveThread;
 
 	public:
-		Connection();
+		Connection(bool _keepAlive = false);
 		~Connection();
 
 		std::string getClientInfo();

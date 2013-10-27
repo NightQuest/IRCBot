@@ -1,12 +1,14 @@
 #include "preCompiled.h"
 
-MariaDB::Connection::Connection() : conn(nullptr)
+MariaDB::Connection::Connection(bool _keepAlive) : conn(nullptr), keepAlive(_keepAlive)
 {
 }
 
 MariaDB::Connection::~Connection()
 {
 	close();
+	if( keepAlive )
+		keepAliveThread.join();
 }
 
 std::string MariaDB::Connection::getClientInfo()
@@ -26,10 +28,31 @@ unsigned int MariaDB::Connection::getLastErrorNo()
 
 bool MariaDB::Connection::open(const std::string& hostname, const std::string& username, const std::string& password, int port, const std::string& database, int flags)
 {
-	if( !conn )
-		conn = mysql_init(nullptr);
+	if( !conn && !(conn = mysql_init(nullptr)) )
+		return false;
 
-	return (conn != nullptr && mysql_real_connect(conn, hostname.c_str(), username.c_str(), password.c_str(), database.c_str(), port, nullptr, flags) != nullptr);
+	if( !mysql_real_connect(conn, hostname.c_str(), username.c_str(), password.c_str(), database.c_str(), port, nullptr, flags) )
+		return false;
+
+	if( keepAlive )
+	{
+		keepAliveThread = std::thread([=](){
+			while( true )
+			{
+				std::chrono::seconds dur = std::chrono::seconds::zero();
+				while( dur < std::chrono::seconds(60) )
+				{
+					if( !conn )
+						return;
+					std::this_thread::sleep_for(std::chrono::seconds(2));
+				}
+				if( mysql_ping(conn) != 0 )
+					break;
+			}
+		});
+	}
+
+	return true;
 }
 
 void MariaDB::Connection::close()
