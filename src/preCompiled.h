@@ -10,5 +10,9 @@
 #include <chrono>
 #include <thread>
 
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
+
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
+#include "IRCClient/IRCClient.h"

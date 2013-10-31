@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace MariaDB
 {
 	class QueryRowField

@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Message>Copy the MariaDB DLL into bin</Message>
@@ -131,7 +131,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\dep\mariadb\win64\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
@@ -157,7 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Message>Copy the MariaDB DLL into bin</Message>
@@ -181,7 +181,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libmariadb.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\dep\mariadb\win64\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
@@ -193,6 +193,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCBot.cpp" />
+    <ClCompile Include="..\src\IRCClient\IRCClient.cpp" />
     <ClCompile Include="..\src\MariaDB\Connection.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryResult.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRow.cpp" />
@@ -210,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Config\Config.h" />
+    <ClInclude Include="..\src\IRCClient\IRCClient.h" />
     <ClInclude Include="..\src\MariaDB\Connection.h" />
     <ClInclude Include="..\src\MariaDB\MariaDB.h" />
     <ClInclude Include="..\src\MariaDB\QueryResult.h" />

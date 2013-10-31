@@ -8,7 +8,7 @@
     <Filter Include="MariaDB">
       <UniqueIdentifier>{f91d9a5f-de4e-4052-bbf6-53c2fb9f1030}</UniqueIdentifier>
     </Filter>
-    <Filter Include="IRClient">
+    <Filter Include="IRCClient">
       <UniqueIdentifier>{406bb890-5aa6-41ea-94c7-eba28181ddcf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -28,6 +28,9 @@
       <Filter>MariaDB</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Config\Config.cpp" />
+    <ClCompile Include="..\src\IRCClient\IRCClient.cpp">
+      <Filter>IRCClient</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -47,5 +50,8 @@
       <Filter>MariaDB</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Config\Config.h" />
+    <ClInclude Include="..\src\IRCClient\IRCClient.h">
+      <Filter>IRCClient</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
