@@ -208,6 +208,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">preCompiled.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\src\Socket\Socket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Config\Config.h" />
@@ -218,6 +219,7 @@
     <ClInclude Include="..\src\MariaDB\QueryRow.h" />
     <ClInclude Include="..\src\MariaDB\QueryRowField.h" />
     <ClInclude Include="..\src\preCompiled.h" />
+    <ClInclude Include="..\src\Socket\Socket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

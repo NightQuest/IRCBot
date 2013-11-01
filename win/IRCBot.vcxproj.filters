@@ -11,6 +11,9 @@
     <Filter Include="IRCClient">
       <UniqueIdentifier>{406bb890-5aa6-41ea-94c7-eba28181ddcf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Socket">
+      <UniqueIdentifier>{d4abb5dd-6daf-498b-a445-6fcd40e85dbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\IRCBot.cpp" />
@@ -30,6 +33,9 @@
     <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCClient\IRCClient.cpp">
       <Filter>IRCClient</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Socket\Socket.cpp">
+      <Filter>Socket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,6 +58,9 @@
     <ClInclude Include="..\src\Config\Config.h" />
     <ClInclude Include="..\src\IRCClient\IRCClient.h">
       <Filter>IRCClient</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Socket\Socket.h">
+      <Filter>Socket</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,14 +1,8 @@
 #pragma once
 
-class IRCClient
+class IRCClient : public Socket
 {
-private:
-	SOCKET hSock;
-	WSADATA wsaData;
-
 public:
-	IRCClient();
+	IRCClient(const std::string& hostname, unsigned int port = 6667);
 	~IRCClient();
-
-	bool open(const std::string& host, unsigned int port);
 };
