@@ -8,7 +8,7 @@ SocketException::SocketException(const std::string& message, const std::string& 
 {
 }
 
-Socket::Socket(const std::string& foreignAddress, unsigned int foreignPort) throw(SocketException) : hSock(INVALID_SOCKET)
+Socket::Socket(const std::string& foreignAddress, unsigned int foreignPort, bool _useSSL) throw(SocketException) : hSock(INVALID_SOCKET), useSSL(_useSSL)
 {
 	WSADATA wsaData;
 	if( WSAStartup(WINSOCK_VERSION, &wsaData) != 0 )
@@ -17,7 +17,7 @@ Socket::Socket(const std::string& foreignAddress, unsigned int foreignPort) thro
 	addrinfo addrCriteria;
 	memset(&addrCriteria, 0, sizeof(addrCriteria));
 
-	addrCriteria.ai_family = AF_UNSPEC;
+	addrCriteria.ai_family = AF_INET;
 	addrCriteria.ai_socktype = SOCK_STREAM;
 	addrCriteria.ai_protocol = IPPROTO_TCP;
 
@@ -40,10 +40,40 @@ Socket::Socket(const std::string& foreignAddress, unsigned int foreignPort) thro
 	freeaddrinfo(serverAddresses);
 	if( hSock == INVALID_SOCKET )
 		throw SocketException("Unable to connect");
+
+	if( useSSL )
+	{
+		SSL_load_error_strings();
+		SSL_library_init();
+			
+		sslContext = SSL_CTX_new(SSLv23_client_method());
+		if( sslContext == nullptr )
+			throw SocketException("SSL_CTX_new() failed");
+
+		sslHandle = SSL_new(sslContext);
+		if( sslHandle == nullptr )
+			throw SocketException("SSL_new() failed");
+
+		if( !SSL_set_fd(sslHandle, static_cast<int>(hSock)) )
+			throw SocketException("SSL_set_fd() failed");
+
+		if( SSL_connect(sslHandle) != 1 )
+			throw SocketException("SSL_connect() failed");
+	}
 }
 
 Socket::~Socket()
 {
+	if( sslHandle != nullptr )
+	{
+		SSL_shutdown(sslHandle);
+		SSL_free(sslHandle);
+	}
+	if( sslContext != nullptr )
+	{
+		SSL_CTX_free(sslContext);
+	}
+
 	if( hSock != INVALID_SOCKET )
 	{
 		::closesocket(hSock);
@@ -52,25 +82,29 @@ Socket::~Socket()
 	WSACleanup();
 }
 
-void Socket::send(const std::vector<char>& data) throw(SocketException)
+void Socket::send(const std::string& data) throw(SocketException)
 {
 	if( data.empty() )
 		throw SocketException("send() failed", "data vector is empty");
 
-	if( ::send(hSock, &data[0], static_cast<int>(data.size()), 0) == SOCKET_ERROR )
+	if( useSSL && SSL_write(sslHandle, &data[0], static_cast<int>(data.size())) <= 0 )
+		throw SocketException("SSL_write() failed");
+	else if( ::send(hSock, &data[0], static_cast<int>(data.size()), 0) == SOCKET_ERROR )
 		throw SocketException("::send() failed");
 }
 
 void Socket::send(const char* data, int dataLen) throw(SocketException)
 {
-	if( ::send(hSock, data, dataLen, 0) == SOCKET_ERROR )
+	if( useSSL && SSL_write(sslHandle, data, dataLen) <= 0 )
+		throw SocketException("SSL_write() failed");
+	else if( ::send(hSock, data, dataLen, 0) == SOCKET_ERROR )
 		throw SocketException("::send() failed");
 }
 
 size_t Socket::recv(char* buffer, int bufferLen) throw(SocketException)
 {
-	int ret = ::recv(hSock, buffer, bufferLen, 0);
-	if( ret == SOCKET_ERROR )
+	int ret = useSSL ? SSL_read(sslHandle, buffer, bufferLen) : ::recv(hSock, buffer, bufferLen, 0);
+	if( ret <= 0 )
 		throw SocketException("::recv() failed");
 	return ret;
 }

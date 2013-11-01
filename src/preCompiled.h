@@ -12,9 +12,6 @@
 #include <thread>
 #include <stdexcept>
 
-#include <WinSock2.h>
-#include <Ws2tcpip.h>
-
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
 #include "Socket/Socket.h"
