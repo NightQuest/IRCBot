@@ -193,11 +193,12 @@
   <ItemGroup>
     <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCBot.cpp" />
-    <ClCompile Include="..\src\IRCClient\IRCClient.cpp" />
     <ClCompile Include="..\src\MariaDB\Connection.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryResult.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRow.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRowField.cpp" />
+    <ClCompile Include="..\src\Networking\IRCClient.cpp" />
+    <ClCompile Include="..\src\Networking\Socket.cpp" />
     <ClCompile Include="..\src\preCompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">preCompiled.h</PrecompiledHeaderFile>
@@ -208,18 +209,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">preCompiled.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="..\src\Socket\Socket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Config\Config.h" />
-    <ClInclude Include="..\src\IRCClient\IRCClient.h" />
     <ClInclude Include="..\src\MariaDB\Connection.h" />
     <ClInclude Include="..\src\MariaDB\MariaDB.h" />
     <ClInclude Include="..\src\MariaDB\QueryResult.h" />
     <ClInclude Include="..\src\MariaDB\QueryRow.h" />
     <ClInclude Include="..\src\MariaDB\QueryRowField.h" />
+    <ClInclude Include="..\src\Networking\IRCClient.h" />
+    <ClInclude Include="..\src\Networking\Socket.h" />
     <ClInclude Include="..\src\preCompiled.h" />
-    <ClInclude Include="..\src\Socket\Socket.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

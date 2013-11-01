@@ -14,5 +14,5 @@
 
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
-#include "Socket/Socket.h"
-#include "IRCClient/IRCClient.h"
+#include "Networking/Socket.h"
+#include "Networking/IRCClient.h"

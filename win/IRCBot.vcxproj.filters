@@ -8,11 +8,8 @@
     <Filter Include="MariaDB">
       <UniqueIdentifier>{f91d9a5f-de4e-4052-bbf6-53c2fb9f1030}</UniqueIdentifier>
     </Filter>
-    <Filter Include="IRCClient">
-      <UniqueIdentifier>{406bb890-5aa6-41ea-94c7-eba28181ddcf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Socket">
-      <UniqueIdentifier>{d4abb5dd-6daf-498b-a445-6fcd40e85dbf}</UniqueIdentifier>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{6b3758a5-30aa-48bd-a46a-9c6aa651b322}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,11 +28,11 @@
       <Filter>MariaDB</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Config\Config.cpp" />
-    <ClCompile Include="..\src\IRCClient\IRCClient.cpp">
-      <Filter>IRCClient</Filter>
+    <ClCompile Include="..\src\Networking\IRCClient.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Socket\Socket.cpp">
-      <Filter>Socket</Filter>
+    <ClCompile Include="..\src\Networking\Socket.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,11 +53,11 @@
       <Filter>MariaDB</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Config\Config.h" />
-    <ClInclude Include="..\src\IRCClient\IRCClient.h">
-      <Filter>IRCClient</Filter>
+    <ClInclude Include="..\src\Networking\IRCClient.h">
+      <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Socket\Socket.h">
-      <Filter>Socket</Filter>
+    <ClInclude Include="..\src\Networking\Socket.h">
+      <Filter>Networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
