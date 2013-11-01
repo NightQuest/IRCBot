@@ -39,12 +39,12 @@ bool MariaDB::Connection::open(const std::string& hostname, const std::string& u
 		keepAliveThread = std::thread([=](){
 			while( true )
 			{
-				std::chrono::seconds dur = std::chrono::seconds::zero();
+				std::chrono::milliseconds dur = std::chrono::milliseconds::zero();
 				while( dur < std::chrono::seconds(60) )
 				{
 					if( !conn )
 						return;
-					std::this_thread::sleep_for(std::chrono::seconds(2));
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 				}
 				if( mysql_ping(conn) != 0 )
 					break;
