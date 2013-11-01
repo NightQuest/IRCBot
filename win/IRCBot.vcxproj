@@ -68,32 +68,32 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\dep\mariadb\win32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\dep\mariadb\win32\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\dep\MariaDB\win32\include;..\dep\OpenSSL\win32\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\dep\MariaDB\win32\lib;..\dep\OpenSSL\win32\lib\VC;$(LibraryPath)</LibraryPath>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\bin\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\dep\mariadb\win64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\dep\mariadb\win64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\dep\MariaDB\win64\include;..\dep\OpenSSL\win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\dep\MariaDB\win64\lib;..\dep\OpenSSL\win64\lib\VC;$(LibraryPath)</LibraryPath>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\bin\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\dep\mariadb\win32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\dep\mariadb\win32\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\dep\MariaDB\win32\include;..\dep\OpenSSL\win32\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\dep\MariaDB\win32\lib;..\dep\OpenSSL\win32\lib\VC;$(LibraryPath)</LibraryPath>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\bin\build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\dep\mariadb\win64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\dep\mariadb\win64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\dep\MariaDB\win64\include;..\dep\OpenSSL\win64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\dep\MariaDB\win64\lib;..\dep\OpenSSL\win64\lib\VC;$(LibraryPath)</LibraryPath>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
     <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\bin\build\$(Configuration)\</IntDir>
@@ -111,11 +111,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;libeay32MDd.lib;ssleay32MDd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Message>Copy the MariaDB DLL into bin</Message>
-      <Command>copy "$(SolutionDir)..\dep\mariadb\win32\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
+      <Message>Copy dep DDLs to bin</Message>
+      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -131,13 +131,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;libeay32MDd.lib;ssleay32MDd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)..\dep\mariadb\win64\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy the MariaDB DLL into bin</Message>
+      <Message>Copy dep DDLs to bin</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,11 +157,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;libeay32MD.lib;ssleay32MD.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Message>Copy the MariaDB DLL into bin</Message>
-      <Command>copy "$(SolutionDir)..\dep\mariadb\win32\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
+      <Message>Copy dep DDLs to bin</Message>
+      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -181,13 +181,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libmariadb.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libmariadb.lib;libeay32MD.lib;ssleay32MD.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)..\dep\mariadb\win64\lib\libmariadb.dll" "$(OutDir)" /Y</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy the MariaDB DLL into bin</Message>
+      <Message>Copy dep DDLs to bin</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
