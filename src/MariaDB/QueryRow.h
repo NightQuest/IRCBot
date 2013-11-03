@@ -16,5 +16,7 @@ namespace MariaDB
 
 		QueryRowField operator[](const std::string& in) const;
 		QueryRowField operator[](unsigned int in) const;
+
+		unsigned int getFieldCount() const { return fieldCount; }
 	};
 };

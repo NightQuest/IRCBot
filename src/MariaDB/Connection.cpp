@@ -26,6 +26,17 @@ unsigned int MariaDB::Connection::getLastErrorNo()
 	return mysql_errno(conn);
 }
 
+bool MariaDB::Connection::escape(std::string& str)
+{
+	unsigned long requested_length = static_cast<unsigned long>(str.size());
+	char* tmp = new char[str.size()*2+1];
+	unsigned long ret = mysql_real_escape_string(conn, tmp, str.c_str(), requested_length);
+	if( ret >= requested_length )
+		str = tmp;
+	delete[] tmp;
+	return ret >= requested_length;
+}
+
 bool MariaDB::Connection::open(const std::string& hostname, const std::string& username, const std::string& password, int port, const std::string& database, int flags)
 {
 	if( !conn && !(conn = mysql_init(nullptr)) )

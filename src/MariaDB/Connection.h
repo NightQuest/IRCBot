@@ -16,6 +16,7 @@ namespace MariaDB
 		std::string getClientInfo();
 		std::string getLastError();
 		unsigned int getLastErrorNo();
+		bool escape(std::string& str);
 		bool open(const std::string& hostname, const std::string& username, const std::string& password = std::string(""), int port = 3306, const std::string& database = std::string(""), int flags = 0);
 		void close();
 		bool ping();
