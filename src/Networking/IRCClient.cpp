@@ -52,6 +52,8 @@ LineData IRCClient::parseLine(const std::string& line) const
 	vector<string> lineParts;
 	string part;
 
+	data.raw = line;
+
 	while( getline(iss, part, ' ') )
 		if( !part.empty() )
 			lineParts.push_back(part);
@@ -137,8 +139,6 @@ void IRCClient::process()
 			if (line[line.size() - 1] == '\r')
 				line.resize(line.size() - 1);
 
-			cout << line << endl;
-
 			LineData data = parseLine(line);
 			if( !data.command.empty() )
 				handleSCommand(data);
@@ -153,22 +153,53 @@ void IRCClient::handleSCommand(const LineData& data)
 		return;
 
 	if( data.command == "PING" )
+	{
 		sendLine("PONG :" + data.data);
+		cout << "PING <-> PONG" << endl;
+	}
 
 	else if( data.command == "001" )
+	{
 		sentUser = true;
+		cout << data.raw << endl;
+	}
 
 	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
+	{
 		setNick(config.getString("irc.altnickname"));
+		cout << data.raw << endl;
+	}
 
 	else if( data.command == "376" ) // end of /MOTD
+	{
 		joinChannel(config.getString("irc.channels"));
+		cout << data.raw << endl;
+	}
+
+	else if( data.command == "JOIN" )
+	{
+		cout << "J " << data.author.nickname << " -> " << data.data << endl;
+		//for( auto& chan : channels )
+		//{
+		//	if( chan.getName() == data.data )
+		//		chan.addUser(data.author.nickname);
+		//}
+	}
 
 	else if( data.command == "PRIVMSG" )
+	{
+		cout << "M " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
 		handlePRIVMSG(data);
+	}
 
 	else if( data.command == "NOTICE" )
+	{
+		cout << "N " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
 		handleNOTICE(data);
+	}
+
+	else
+		cout << data.raw << endl;
 }
 
 void IRCClient::handleCCommand(const std::string& command, const std::string& args, const LineData& data)

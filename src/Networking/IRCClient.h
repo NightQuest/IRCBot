@@ -21,17 +21,7 @@ struct LineData
 	std::string param;
 	std::string target;
 	std::string data;
-};
-
-class Channel
-{
-private:
-	std::string name;
-
-public:
-	Channel(const std::string& _name) : name(_name) { }
-
-	const std::string getName() const { return name; }
+	std::string raw;
 };
 
 enum botAccess
