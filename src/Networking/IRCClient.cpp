@@ -258,14 +258,16 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 		if( res && res->getRowCount() != 0 )
 		{
 			MariaDB::QueryRow* row;
-			if( res->nextRow() && (row = res->getRow()) )
+			int rows = 0;
+			while( rows < 15 && res->nextRow() && (row = res->getRow()) )
 			{
+				rows++;
 				stringstream ss;
 				unsigned int rowCount = row->getFieldCount();
 				for( unsigned int x = 0; x < rowCount; x++ )
 				{
 					if( x > 0 && x < rowCount )
-						ss << ",";
+						ss << ", ";
 					ss << (*row)[x].getString();
 				}
 
