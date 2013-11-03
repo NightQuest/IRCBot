@@ -169,7 +169,7 @@ void IRCClient::handleSCommand(const LineData& data)
 		cout << "MOTD: " << data.data << endl;
 	}
 
-	else if( data.command == "372" ) // beginning of /MOTD
+	else if( data.command == "375" ) // beginning of /MOTD
 	{
 		cout << "MOTD: " << data.data << endl;
 	}
