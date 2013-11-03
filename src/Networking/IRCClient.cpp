@@ -12,10 +12,37 @@ IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, c
 {
 	connected = (hSock != INVALID_SOCKET);
 	internalDB = move(unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true)));
+	externalDB = move(unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true)));
 }
 
 IRCClient::~IRCClient()
 {
+	if( connected )
+		send("QUIT :" + config.getString("irc.quitmessage"));
+}
+
+int IRCClient::recvData(char* data, int dataLen)
+{
+	int ret = recv(data, dataLen);
+	if( ret <= 0 )
+		connected = false;
+	return ret;
+}
+
+int IRCClient::sendData(const std::string& data)
+{
+	int ret = send(data.data(), static_cast<int>(data.length()));
+	if( ret <= 0 )
+		connected = false;
+	return ret;
+}
+
+int IRCClient::sendData(const char* data, int dataLen)
+{
+	int ret = send(data, dataLen);
+	if( ret <= 0 )
+		connected = false;
+	return ret;
 }
 
 LineData IRCClient::parseLine(const std::string& line) const
@@ -73,19 +100,33 @@ LineData IRCClient::parseLine(const std::string& line) const
 
 void IRCClient::process()
 {
-	if( !internalDB->open(config.getString("database.internal.hostname"), config.getString("database.internal.username"), config.getString("database.internal.password"), config.getUInt("database.internal.port"), config.getString("database.internal.defaultdb")) )
+	cout << "Establishing internal database connection... ";
+	if( !internalDB->open(config.getString("database.internal.hostname"), config.getString("database.internal.username"),
+		config.getString("database.internal.password"), config.getUInt("database.internal.port"), config.getString("database.internal.defaultdb")) )
+	{
+		cout << "Failed" << endl;
 		internalDB.reset();
+	}
+	else
+		cout << "OK" << endl;
+	
+	cout << "Establishing external database connection... ";
+	if( !externalDB->open(config.getString("database.external.hostname"), config.getString("database.external.username"),
+		config.getString("database.external.password"), config.getUInt("database.external.port"), config.getString("database.external.defaultdb")) )
+	{
+		cout << "Failed" << endl;
+		externalDB.reset();
+	}
+	else
+		cout << "OK" << endl;
 
 	vector<char> recvBuff(1024);
 	while( connected )
 	{
-		int ret = recv(&recvBuff[0], 1024);
+		int ret = recvData(&recvBuff[0], 1024);
 		if( ret <= 0 )
-		{
-			connected = false;
 			return;
-		}
-		
+
 		istringstream iss(recvBuff.data());
 		string line;
 		while( getline(iss, line) )
@@ -100,19 +141,19 @@ void IRCClient::process()
 
 			LineData data = parseLine(line);
 			if( !data.command.empty() )
-				handleCommand(data);
+				handleSCommand(data);
 		}
 		std::memset(&recvBuff[0], 0, 1024);
 	}
 }
 
-void IRCClient::handleCommand(const LineData& data)
+void IRCClient::handleSCommand(const LineData& data)
 {
 	if( data.command.empty() )
 		return;
 
 	if( data.command == "PING" )
-		send("PONG :" + data.data);
+		sendLine("PONG :" + data.data);
 
 	else if( data.command == "001" )
 		sentUser = true;
@@ -120,28 +161,138 @@ void IRCClient::handleCommand(const LineData& data)
 	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
 		setNick(config.getString("irc.altnickname"));
 
-	else if( data.command == "376" && !config.getString("irc.channels").empty() ) // end of /MOTD
+	else if( data.command == "376" ) // end of /MOTD
 		joinChannel(config.getString("irc.channels"));
 
-	else if( data.command == "PRIVMSG" && data.data == "\x1VERSION\x1" ) // ctcp VERSION
-		send("NOTICE " + data.author.nickname + " :\x1VERSION " + config.getString("irc.ctcpversion") + "\x1\r\n");
+	else if( data.command == "PRIVMSG" )
+		handlePRIVMSG(data);
 
-	else if( !sentUser && data.command == "NOTICE" && data.target == "AUTH" && data.data.find("*** Found") != string::npos )
+	else if( data.command == "NOTICE" )
+		handleNOTICE(data);
+}
+
+void IRCClient::handleCCommand(const std::string& command, const std::string& args, const LineData& data)
+{
+	if( command == "quit" && hasAccess(data.author.full, ACCESS_QUIT) )
 	{
-		send("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name") + "\r\n");
+		sendLine("QUIT :" + config.getString("irc.quitmessage"));
+	}
+
+	else if( command == "exit" && hasAccess(data.author.full, ACCESS_QUIT) )
+	{
+		sendLine("QUIT :" + config.getString("irc.quitmessage"));
+		exit(0);
+	}
+
+	else if( command == "say" && hasAccess(data.author.full, ACCESS_SAY) )
+	{
+		sendMessage(data.target, args);
+	}
+
+	else if( command == "sql" && hasAccess(data.author.full, ACCESS_SQL) && externalDB )
+	{
+		MariaDB::QueryResult res = externalDB->query(args);
+		if( res && res->getRowCount() != 0 )
+		{
+			MariaDB::QueryRow* row;
+			if( res->nextRow() && (row = res->getRow()) )
+			{
+				stringstream ss;
+				unsigned int rowCount = row->getFieldCount();
+				for( unsigned int x = 0; x < rowCount; x++ )
+				{
+					if( x > 0 && x < rowCount )
+						ss << ",";
+					ss << (*row)[x].getString();
+				}
+
+				sendMessage(data.target, ss.str());
+			}
+		}
+		else
+			sendMessage(data.target, "No results");
+	}
+}
+
+void IRCClient::handlePRIVMSG(const LineData& data)
+{
+	if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
+		handleCTCP(data);
+
+	else if( data.target != activeNickname )
+	{
+		if ( data.data[0] == '!' )
+		{
+			string command, args;
+
+			size_t pos = data.data.find_first_of(' ');
+			if( pos != string::npos )
+			{
+				command = data.data.substr(1, pos-1);
+				args = data.data.substr(pos+1);
+			}
+			else
+				command = data.data.substr(1, data.data.length()-1);
+
+			handleCCommand(command, args, data);
+		}
+	}
+}
+
+void IRCClient::handleNOTICE(const LineData& data)
+{
+	if( !sentUser && data.target == "AUTH" && data.data.find("*** Found") != string::npos ) // we're connecting
+	{
+		sendLine("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name"));
 		setNick(config.getString("irc.nickname"));
 	}
 }
 
+void IRCClient::handleCTCP(const LineData& data)
+{
+	string query, args;
+
+	size_t pos = data.data.find(' ');
+	if( pos != string::npos )
+	{
+		query = data.data.substr(1, pos-1);
+		args = data.data.substr(++pos, data.data.length()-pos);
+	}
+	else
+		query = data.data.substr(1, data.data.length()-2);
+
+	if( query == "VERSION" )
+		sendCTCPReply(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
+}
+
+bool IRCClient::hasAccess(const std::string& user, unsigned int perm)
+{
+	if( user.empty() || perm == 0 || !internalDB )
+		return false;
+
+	MariaDB::QueryResult res = internalDB->query("SELECT `access` FROM `perms` WHERE `user` = '" + user + "';");
+	if( res && res->getRowCount() != 0 )
+	{
+		MariaDB::QueryRow* row;
+		if( res->nextRow() && (row = res->getRow()) )
+			return ((*row)["access"].getUInt32() & perm) == perm;
+	}
+
+	return false;
+}
+
 void IRCClient::setNick(const std::string& newNick)
 {
-	if( connected && send("NICK " + newNick + "\r\n") > 0 )
+	if( connected && sendLine("NICK " + newNick) > 0 )
 		activeNickname = newNick;
 }
 
 void IRCClient::joinChannel(const std::string& channel)
 {
-	if( connected && send("JOIN " + channel + "\r\n") > 0 )
+	if( !connected || channel.empty() )
+		return;
+
+	if( sendLine("JOIN " + channel) > 0 )
 	{
 		istringstream iss(channel);
 		string chan;
@@ -153,4 +304,9 @@ void IRCClient::joinChannel(const std::string& channel)
 			channels.push_back(Channel(chan));
 		}
 	}
+}
+
+void IRCClient::sendMessage(const std::string& target, const std::string& message)
+{
+	sendLine("PRIVMSG " + target + " :" + message);
 }
