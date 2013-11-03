@@ -158,43 +158,75 @@ void IRCClient::handleSCommand(const LineData& data)
 		cout << "PING <-> PONG" << endl;
 	}
 
-	else if( data.command == "001" )
+	else if( data.command == "001" ) // Welcome
 	{
 		sentUser = true;
 		cout << data.raw << endl;
 	}
 
-	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
+	else if( data.command == "372" ) // MOTD
 	{
-		setNick(config.getString("irc.altnickname"));
-		cout << data.raw << endl;
+		cout << "MOTD: " << data.data << endl;
+	}
+
+	else if( data.command == "372" ) // beginning of /MOTD
+	{
+		cout << "MOTD: " << data.data << endl;
 	}
 
 	else if( data.command == "376" ) // end of /MOTD
 	{
 		joinChannel(config.getString("irc.channels"));
-		cout << data.raw << endl;
+		cout << "MOTD: " << data.data << endl;
+	}
+
+	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
+	{
+		setNick(config.getString("irc.altnickname"));
+		cout << "E " << data.data << endl;
+	}
+
+	else if( data.command == "439" ) // Please wait while we process your connection.
+	{
+		cout << data.data << endl;
+	}
+
+	else if( data.command == "MODE" )
+	{
+		cout << "M " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
 	}
 
 	else if( data.command == "JOIN" )
 	{
 		cout << "J " << data.author.nickname << " -> " << data.data << endl;
-		//for( auto& chan : channels )
-		//{
-		//	if( chan.getName() == data.data )
-		//		chan.addUser(data.author.nickname);
-		//}
+	}
+
+	else if( data.command == "PART" )
+	{
+		cout << "P " << data.author.nickname << " -> " << data.data << endl;
+	}
+
+	else if( data.command == "QUIT" )
+	{
+		cout << "Q " << data.author.nickname;
+		if( data.data.empty() )
+			cout << endl;
+		else
+			cout << ": " << data.data << endl;
 	}
 
 	else if( data.command == "PRIVMSG" )
 	{
-		cout << "M " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
+		cout << "P " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
 		handlePRIVMSG(data);
 	}
 
 	else if( data.command == "NOTICE" )
 	{
-		cout << "N " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
+		if( data.target == "AUTH" )
+			cout << "N " << data.target << ": " << data.data << endl;
+		else
+			cout << "N " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
 		handleNOTICE(data);
 	}
 
