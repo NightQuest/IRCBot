@@ -30,7 +30,7 @@ bool Config::load(const std::string& filename)
 			size_t lastQuote = value.find_last_of('"');
 
 			if( firstQuote != std::string::npos && lastQuote != std::string::npos )
-				value = value.substr(firstQuote+1, lastQuote-1);
+				value = value.substr(firstQuote+1, lastQuote-2);
 
 			size_t leadingWhiteSpace = index.find_first_not_of(" \t");
 			if( leadingWhiteSpace != std::string::npos )
