@@ -19,17 +19,30 @@ struct LineData
 	LineAuthor author;
 	std::string command;
 	std::string param;
+	std::string target;
 	std::string data;
+};
+
+class Channel
+{
+private:
+	std::string name;
+
+public:
+	Channel(const std::string& _name) : name(_name) { }
+
+	const std::string getName() const { return name; }
 };
 
 class IRCClient : public Socket
 {
 private:
-	std::vector<std::string> channels;
+	std::vector<Channel> channels;
 	std::string activeNickname;
-	std::string joinUser;
-	std::string joinNickname;
-	std::string joinAltNickname;
+	const Config& config;
+	std::unique_ptr<MariaDB::Connection> internalDB;
+	std::unique_ptr<MariaDB::Connection> externalDB;
+
 	bool connected;
 	bool sentUser;
 
@@ -37,12 +50,13 @@ private:
 	void handleCommand(const LineData& data);
 
 	void setNick(const std::string& newNick);
+	void joinChannel(const std::string& channel);
 
 public:
-	IRCClient(const std::string& hostname, unsigned int port, bool ssl, const std::string& user, const std::string& nick, const std::string& aNick);
+	IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config);
 	~IRCClient();
 
 	bool isConnected() const { return connected; }
 
-	void process(Config config);
+	void process();
 };

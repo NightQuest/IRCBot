@@ -8,10 +8,10 @@ IRCException::IRCException(const std::string& message, const std::string& detail
 {
 }
 
-IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, const std::string& user, const std::string& nick, const std::string& aNick)
-	: Socket(hostname, port, ssl), joinUser(user), joinNickname(nick), joinAltNickname(aNick), sentUser(false)
+IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config) : Socket(hostname, port, ssl), config(_config), sentUser(false)
 {
 	connected = (hSock != INVALID_SOCKET);
+	internalDB = move(unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true)));
 }
 
 IRCClient::~IRCClient()
@@ -41,18 +41,27 @@ LineData IRCClient::parseLine(const std::string& line) const
 		size_t pos, pos2;
 
 		data.author.full = lineParts[0].substr(1); // drop the :
-		pos = lineParts[0].find_first_of('!');
+		pos = data.author.full.find_first_of('!');
 		if( pos != string::npos )
-			data.author.nickname = lineParts[0].substr(0, pos);
+			data.author.nickname = data.author.full.substr(0, pos);
 		pos2 = lineParts[0].find_first_of('@');
 		if( pos2 != string::npos )
 		{
-			data.author.ident = lineParts[0].substr(pos, pos2);
-			data.author.hostname = lineParts[0].substr(pos2);
+			if( pos != string::npos )
+				data.author.ident = data.author.full.substr(++pos, (pos2-1)-pos);
+
+			data.author.hostname = data.author.full.substr(pos2);
 		}
 
 		data.command = lineParts[1];
-		data.param = lineParts[2];
+		
+		if( lineParts.size() >= 4 && lineParts[3][0] != ':' )
+		{
+			data.target = lineParts[3];
+			data.param = lineParts[2];
+		}
+		else
+			data.target = lineParts[2];
 
 		pos = line.find(lineParts[1] + ' ' + lineParts[2] + " :");
 		if( pos != string::npos )
@@ -62,12 +71,15 @@ LineData IRCClient::parseLine(const std::string& line) const
 	return data;
 }
 
-void IRCClient::process(Config config)
+void IRCClient::process()
 {
-	vector<char> recvBuff(512);
+	if( !internalDB->open(config.getString("database.internal.hostname"), config.getString("database.internal.username"), config.getString("database.internal.password"), config.getUInt("database.internal.port"), config.getString("database.internal.defaultdb")) )
+		internalDB.reset();
+
+	vector<char> recvBuff(1024);
 	while( connected )
 	{
-		int ret = recv(&recvBuff[0], 512);
+		int ret = recv(&recvBuff[0], 1024);
 		if( ret <= 0 )
 		{
 			connected = false;
@@ -78,6 +90,9 @@ void IRCClient::process(Config config)
 		string line;
 		while( getline(iss, line) )
 		{
+			if( line.empty() )
+				continue;
+
 			if (line[line.size() - 1] == '\r')
 				line.resize(line.size() - 1);
 
@@ -87,7 +102,7 @@ void IRCClient::process(Config config)
 			if( !data.command.empty() )
 				handleCommand(data);
 		}
-		memset(&recvBuff[0], 0, recvBuff.size());
+		std::memset(&recvBuff[0], 0, 1024);
 	}
 }
 
@@ -98,12 +113,23 @@ void IRCClient::handleCommand(const LineData& data)
 
 	if( data.command == "PING" )
 		send("PONG :" + data.data);
-	
-	else if( !sentUser && data.command == "NOTICE" && data.param == "AUTH" && data.data.find("*** Found") != string::npos )
-	{
-		send("USER " + joinUser + " 8 * :" + joinUser + "\r\n");
-		setNick(joinNickname);
+
+	else if( data.command == "001" )
 		sentUser = true;
+
+	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
+		setNick(config.getString("irc.altnickname"));
+
+	else if( data.command == "376" && !config.getString("irc.channels").empty() ) // end of /MOTD
+		joinChannel(config.getString("irc.channels"));
+
+	else if( data.command == "PRIVMSG" && data.data == "\x1VERSION\x1" ) // ctcp VERSION
+		send("NOTICE " + data.author.nickname + " :\x1VERSION " + config.getString("irc.ctcpversion") + "\x1\r\n");
+
+	else if( !sentUser && data.command == "NOTICE" && data.target == "AUTH" && data.data.find("*** Found") != string::npos )
+	{
+		send("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name") + "\r\n");
+		setNick(config.getString("irc.nickname"));
 	}
 }
 
@@ -111,4 +137,20 @@ void IRCClient::setNick(const std::string& newNick)
 {
 	if( connected && send("NICK " + newNick + "\r\n") > 0 )
 		activeNickname = newNick;
+}
+
+void IRCClient::joinChannel(const std::string& channel)
+{
+	if( connected && send("JOIN " + channel + "\r\n") > 0 )
+	{
+		istringstream iss(channel);
+		string chan;
+		while( getline(iss,chan,',') )
+		{
+			if( chan.empty() )
+				continue;
+
+			channels.push_back(Channel(chan));
+		}
+	}
 }
