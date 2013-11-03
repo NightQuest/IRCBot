@@ -25,7 +25,7 @@ Socket::Socket(const std::string& foreignAddress, unsigned int foreignPort, bool
 	if( getaddrinfo(foreignAddress.c_str(), std::to_string(foreignPort).c_str(), &addrCriteria, &serverAddresses) != 0 )
 		throw SocketException("getaddrinfo() failed");
 
-	for( addrinfo* currentAddress = serverAddresses; currentAddress != nullptr && hSock != INVALID_SOCKET; currentAddress = currentAddress->ai_next )
+	for( addrinfo* currentAddress = serverAddresses; currentAddress != nullptr && hSock == INVALID_SOCKET; currentAddress = currentAddress->ai_next )
 	{
 		if( (hSock = ::socket(currentAddress->ai_family, currentAddress->ai_socktype, currentAddress->ai_protocol)) != INVALID_SOCKET )
 		{
@@ -82,29 +82,33 @@ Socket::~Socket()
 	WSACleanup();
 }
 
-void Socket::send(const std::string& data) throw(SocketException)
+int Socket::send(const std::string& data) throw(SocketException)
 {
 	if( data.empty() )
-		throw SocketException("send() failed", "data vector is empty");
+		throw SocketException("send() failed", "data is empty");
 
-	if( useSSL && SSL_write(sslHandle, &data[0], static_cast<int>(data.size())) <= 0 )
-		throw SocketException("SSL_write() failed");
-	else if( ::send(hSock, &data[0], static_cast<int>(data.size()), 0) == SOCKET_ERROR )
-		throw SocketException("::send() failed");
+	int ret = 0;
+	if( useSSL )
+		ret = SSL_write(sslHandle, data.c_str(), static_cast<int>(data.size()));
+	else
+		ret = ::send(hSock, data.c_str(), static_cast<int>(data.length()), 0);
+	return ret;
 }
 
-void Socket::send(const char* data, int dataLen) throw(SocketException)
+int Socket::send(const char* data, int dataLen) throw(SocketException)
 {
-	if( useSSL && SSL_write(sslHandle, data, dataLen) <= 0 )
-		throw SocketException("SSL_write() failed");
-	else if( ::send(hSock, data, dataLen, 0) == SOCKET_ERROR )
-		throw SocketException("::send() failed");
+	int ret = 0;
+	if( useSSL )
+		ret = SSL_write(sslHandle, data, dataLen);
+	else
+		ret = ::send(hSock, data, dataLen, 0);
+	return ret;
 }
 
-size_t Socket::recv(char* buffer, int bufferLen) throw(SocketException)
+int Socket::recv(char* buffer, int bufferLen) throw(SocketException)
 {
 	int ret = useSSL ? SSL_read(sslHandle, buffer, bufferLen) : ::recv(hSock, buffer, bufferLen, 0);
-	if( ret <= 0 )
+	if( ret < 0 )
 		throw SocketException("::recv() failed");
 	return ret;
 }

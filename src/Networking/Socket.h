@@ -17,17 +17,22 @@ public:
 class Socket
 {
 private:
-	SOCKET hSock;
-	SSL* sslHandle;
 	SSL_CTX* sslContext;
 	bool useSSL;
 
-public:
-	Socket::Socket(const std::string& addr, unsigned int port, bool _useSSL = false) throw(SocketException);
-	virtual ~Socket();
+protected:
+	SOCKET hSock;
+	SSL* sslHandle;
+	
+	Socket(const std::string& addr, unsigned int port, bool _useSSL = false) throw(SocketException);
 
-	void send(const std::string& data) throw(SocketException);
-	void send(const char* data, int dataLen) throw(SocketException);
-	size_t recv(char* buffer, int bufferLen) throw(SocketException);
+	int send(const std::string& data) throw(SocketException);
+	int send(const char* data, int dataLen) throw(SocketException);
+	int recv(char* buffer, int bufferLen) throw(SocketException);
+
+	bool usingSSL() const { return useSSL; }
+
+public:
+	virtual ~Socket();
 
 };
