@@ -30,6 +30,7 @@
     <ClCompile Include="..\src\Networking\Socket.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\App.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -55,5 +56,9 @@
     <ClInclude Include="..\src\Networking\Socket.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\App.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\IRCBot.default.conf" />
   </ItemGroup>
 </Project>

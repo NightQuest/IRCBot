@@ -191,6 +191,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCBot.cpp" />
     <ClCompile Include="..\src\MariaDB\Connection.cpp" />
@@ -211,6 +212,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\App.h" />
     <ClInclude Include="..\src\Config\Config.h" />
     <ClInclude Include="..\src\MariaDB\Connection.h" />
     <ClInclude Include="..\src\MariaDB\MariaDB.h" />
@@ -220,6 +222,9 @@
     <ClInclude Include="..\src\Networking\IRCClient.h" />
     <ClInclude Include="..\src\Networking\Socket.h" />
     <ClInclude Include="..\src\preCompiled.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\IRCBot.default.conf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

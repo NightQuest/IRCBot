@@ -11,8 +11,14 @@
 #include <chrono>
 #include <thread>
 #include <stdexcept>
+#include <sstream>
+#include <regex>
+
+using namespace std;
 
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
 #include "Networking/Socket.h"
 #include "Networking/IRCClient.h"
+
+#include "App.h"
