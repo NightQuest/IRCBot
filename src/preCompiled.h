@@ -19,6 +19,8 @@ using namespace std;
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
 #include "Networking/Socket.h"
+#include "IRC/User.h"
+#include "IRC/Channel.h"
 #include "Networking/IRCClient.h"
 
 #include "App.h"

@@ -194,6 +194,8 @@
     <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\Config\Config.cpp" />
     <ClCompile Include="..\src\IRCBot.cpp" />
+    <ClCompile Include="..\src\IRC\Channel.cpp" />
+    <ClCompile Include="..\src\IRC\User.cpp" />
     <ClCompile Include="..\src\MariaDB\Connection.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryResult.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRow.cpp" />
@@ -214,6 +216,8 @@
   <ItemGroup>
     <ClInclude Include="..\src\App.h" />
     <ClInclude Include="..\src\Config\Config.h" />
+    <ClInclude Include="..\src\IRC\Channel.h" />
+    <ClInclude Include="..\src\IRC\User.h" />
     <ClInclude Include="..\src\MariaDB\Connection.h" />
     <ClInclude Include="..\src\MariaDB\MariaDB.h" />
     <ClInclude Include="..\src\MariaDB\QueryResult.h" />

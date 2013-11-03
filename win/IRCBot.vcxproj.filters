@@ -7,6 +7,9 @@
     <Filter Include="Networking">
       <UniqueIdentifier>{6b3758a5-30aa-48bd-a46a-9c6aa651b322}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IRC">
+      <UniqueIdentifier>{ee8b6ef6-94d6-40b5-8c7c-e148dd65e8a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\IRCBot.cpp" />
@@ -24,13 +27,19 @@
       <Filter>MariaDB</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Config\Config.cpp" />
-    <ClCompile Include="..\src\Networking\IRCClient.cpp">
-      <Filter>Networking</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Networking\Socket.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="..\src\App.cpp" />
+    <ClCompile Include="..\src\IRC\Channel.cpp">
+      <Filter>IRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Networking\IRCClient.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IRC\User.cpp">
+      <Filter>IRC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -50,13 +59,19 @@
       <Filter>MariaDB</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Config\Config.h" />
-    <ClInclude Include="..\src\Networking\IRCClient.h">
-      <Filter>Networking</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Networking\Socket.h">
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="..\src\App.h" />
+    <ClInclude Include="..\src\IRC\Channel.h">
+      <Filter>IRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Networking\IRCClient.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IRC\User.h">
+      <Filter>IRC</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\IRCBot.default.conf" />
