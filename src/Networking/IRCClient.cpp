@@ -252,6 +252,11 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 		sendMessage(data.target, args);
 	}
 
+	else if( command == "me" && hasAccess(data.author.full, ACCESS_SAY) )
+	{
+		sendAction(data.target, args);
+	}
+
 	else if( command == "sql" && hasAccess(data.author.full, ACCESS_SQL) && externalDB )
 	{
 		MariaDB::QueryResult res = externalDB->query(args);
@@ -327,7 +332,7 @@ void IRCClient::handleCTCP(const LineData& data)
 		query = data.data.substr(1, data.data.length()-2);
 
 	if( query == "VERSION" )
-		sendCTCPReply(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
+		sendCTCPResponse(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
 }
 
 bool IRCClient::hasAccess(const std::string& user, unsigned int perm)
@@ -369,9 +374,4 @@ void IRCClient::joinChannel(const std::string& channel)
 			channels.push_back(Channel(chan));
 		}
 	}
-}
-
-void IRCClient::sendMessage(const std::string& target, const std::string& message)
-{
-	sendLine("PRIVMSG " + target + " :" + message);
 }

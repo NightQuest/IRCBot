@@ -47,8 +47,10 @@ private:
 	int sendData(const char* data, int dataLen);
 	int sendData(const std::string& data);
 	int sendLine(const std::string& line) { return sendData(line + "\r\n"); }
-	int sendCTCPReply(const std::string& target, const std::string& ctcp, const std::string& msg) { return sendData("NOTICE " + target + " :\x1" + ctcp + " " + msg + "\x1\r\n"); }
-	int sendCTCPRequest(const std::string& target, const std::string& ctcp) { return sendData("PRIVMSG " + target + " :\x1" + ctcp + "\x1\r\n"); }
+	int sendCTCPResponse(const std::string& target, const std::string& ctcp, const std::string& msg) { return sendLine("NOTICE " + target + " :\x1" + ctcp + " " + msg + "\x1"); }
+	int sendCTCP(const std::string& target, const std::string& ctcp) { return sendLine("PRIVMSG " + target + " :\x1" + ctcp + "\x1"); }
+	int sendAction(const std::string& target, const std::string& message) { return sendCTCP(target, "ACTION " + message); }
+	int sendMessage(const std::string& target, const std::string& message) { return sendLine("PRIVMSG " + target + " :" + message); }
 
 	LineData parseLine(const std::string& line) const;
 	void handleSCommand(const LineData& data);
@@ -61,7 +63,6 @@ private:
 
 	void setNick(const std::string& newNick);
 	void joinChannel(const std::string& channel);
-	void sendMessage(const std::string& target, const std::string& message);
 
 public:
 	IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config);
