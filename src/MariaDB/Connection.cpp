@@ -7,8 +7,6 @@ MariaDB::Connection::Connection(bool _keepAlive) : conn(nullptr), keepAlive(_kee
 MariaDB::Connection::~Connection()
 {
 	close();
-	if( keepAlive )
-		keepAliveThread.join();
 }
 
 std::string MariaDB::Connection::getClientInfo()
@@ -44,24 +42,6 @@ bool MariaDB::Connection::open(const std::string& hostname, const std::string& u
 
 	if( !mysql_real_connect(conn, hostname.c_str(), username.c_str(), password.c_str(), database.c_str(), port, nullptr, flags) )
 		return false;
-
-	if( keepAlive )
-	{
-		keepAliveThread = std::thread([=](){
-			while( true )
-			{
-				std::chrono::milliseconds dur = std::chrono::milliseconds::zero();
-				while( dur < std::chrono::seconds(60) )
-				{
-					if( !conn )
-						return;
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-				}
-				if( mysql_ping(conn) != 0 )
-					break;
-			}
-		});
-	}
 
 	return true;
 }

@@ -156,6 +156,11 @@ void IRCClient::handleSCommand(const LineData& data)
 	{
 		sendLine("PONG :" + data.data);
 		cout << "PING <-> PONG" << endl;
+
+		if( externalDB && externalDB->keepAlive )
+			externalDB->ping();
+		if( internalDB && internalDB->keepAlive )
+			internalDB->ping();
 	}
 
 	else if( data.command == "001" ) // Welcome
