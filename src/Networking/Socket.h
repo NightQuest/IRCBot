@@ -14,15 +14,22 @@ public:
 	SocketException(const std::string& message, const std::string& detail) throw();
 };
 
-class Socket
+struct SocketDesc
 {
-private:
+	SOCKET socketHandle;
+	SSL* sslHandle;
 	SSL_CTX* sslContext;
 	bool useSSL;
 
+	std::string hostname;
+	unsigned int port;
+};
+
+class Socket
+{
 protected:
-	SOCKET hSock;
-	SSL* sslHandle;
+	SocketDesc hSock;
+	bool connected;
 	
 	Socket(const std::string& addr, unsigned int port, bool _useSSL = false) throw(SocketException);
 
@@ -30,9 +37,9 @@ protected:
 	int send(const char* data, int dataLen) throw(SocketException);
 	int recv(char* buffer, int bufferLen) throw(SocketException);
 
-	bool usingSSL() const { return useSSL; }
+	bool usingSSL() const { return hSock.useSSL; }
 
 public:
+	Socket(const SocketDesc& _sock) : hSock(_sock) { }
 	virtual ~Socket();
-
 };

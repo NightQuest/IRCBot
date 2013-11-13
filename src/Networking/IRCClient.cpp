@@ -10,7 +10,7 @@ IRCException::IRCException(const std::string& message, const std::string& detail
 
 IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config) : Socket(hostname, port, ssl), config(_config), sentUser(false)
 {
-	connected = (hSock != INVALID_SOCKET);
+	connected = (hSock.socketHandle != INVALID_SOCKET);
 	internalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
 	externalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
 }
@@ -18,31 +18,9 @@ IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, c
 IRCClient::~IRCClient()
 {
 	if( connected )
-		send("QUIT :" + config.getString("irc.quitmessage"));
-}
+		sendLine("QUIT :" + config.getString("irc.quitmessage"));
 
-int IRCClient::recvData(char* data, int dataLen)
-{
-	int ret = recv(data, dataLen);
-	if( ret <= 0 )
-		connected = false;
-	return ret;
-}
-
-int IRCClient::sendData(const std::string& data)
-{
-	int ret = send(data.data(), static_cast<int>(data.length()));
-	if( ret <= 0 )
-		connected = false;
-	return ret;
-}
-
-int IRCClient::sendData(const char* data, int dataLen)
-{
-	int ret = send(data, dataLen);
-	if( ret <= 0 )
-		connected = false;
-	return ret;
+	sScriptMgr->unregisterAll();
 }
 
 LineData IRCClient::parseLine(const std::string& line) const
@@ -83,18 +61,26 @@ LineData IRCClient::parseLine(const std::string& line) const
 		}
 
 		data.command = lineParts[1];
-		
-		if( lineParts.size() >= 4 && lineParts[3][0] != ':' )
-		{
-			data.target = lineParts[3];
-			data.param = lineParts[2];
-		}
-		else
-			data.target = lineParts[2];
+		data.target = lineParts[2];
 
-		pos = line.find(lineParts[1] + ' ' + lineParts[2] + " :");
-		if( pos != string::npos )
-			data.data = line.substr(pos + string(lineParts[1] + ' ' + lineParts[2] + " :").length());
+		std::stringstream str;
+		str << lineParts[1];
+		for( int x = 2; x < lineParts.size(); ++x )
+		{
+			if( lineParts[x][0] == ':' )
+			{
+				str << " :";
+				pos = line.find(str.str());
+				if( pos != string::npos )
+					data.data = line.substr(pos + str.str().length());
+				break;
+			}
+			else
+			{
+				str << " " << lineParts[x];
+				data.params.push_back(lineParts[x]);
+			}
+		}
 	}
 
 	return data;
@@ -122,10 +108,12 @@ void IRCClient::process()
 	else
 		cout << "OK" << endl;
 
+	setupScripts(hSock);
+
 	vector<char> recvBuff(1024);
 	while( connected )
 	{
-		int ret = recvData(&recvBuff[0], 1024);
+		int ret = recv(&recvBuff[0], 1024);
 		if( ret <= 0 )
 			return;
 
@@ -198,17 +186,20 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "MODE" )
 	{
-		cout << "M " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
+		cout << "M " << data.author.nickname << " -> " << data.target << ":";
+		for( const string& str : data.params )
+			cout << " " << str;
+		cout << endl;
 	}
 
 	else if( data.command == "JOIN" )
 	{
-		cout << "J " << data.author.nickname << " -> " << data.data << endl;
+		cout << "J " << data.author.nickname << " -> " << data.target << endl;
 	}
 
 	else if( data.command == "PART" )
 	{
-		cout << "P " << data.author.nickname << " -> " << data.data << endl;
+		cout << "P " << data.author.nickname << " -> " << data.target << endl;
 	}
 
 	else if( data.command == "QUIT" )
@@ -222,7 +213,24 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "PRIVMSG" )
 	{
-		cout << "P " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
+		if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
+		{
+			string str = data.data.substr(1, data.data.length()-2);
+			size_t pos = str.find_first_of(' ');
+			if( pos != string::npos )
+			{
+				string ctcp = str.substr(0, pos);
+				string args = str.substr(++pos);
+				
+				sScriptMgr->onCTCP(data.author.nickname, data.target, ctcp, args);
+
+				if( ctcp == "ACTION" )
+					sScriptMgr->onChatAction(data.author.nickname, data.target, args);
+			}
+			else
+				sScriptMgr->onCTCP(data.author.nickname, data.target, str, "");
+		}
+		sScriptMgr->onChatText(data.author.nickname, data.target, data.data);
 		handlePRIVMSG(data);
 	}
 
@@ -376,7 +384,7 @@ void IRCClient::joinChannel(const std::string& channel)
 			if( chan.empty() )
 				continue;
 
-			channels.push_back(Channel(chan));
+			channels.insert(make_pair(chan, Channel(chan)));
 		}
 	}
 }

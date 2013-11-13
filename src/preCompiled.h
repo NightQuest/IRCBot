@@ -22,5 +22,8 @@ using namespace std;
 #include "IRC/User.h"
 #include "IRC/Channel.h"
 #include "Networking/IRCClient.h"
+#include "Scripting/SetupScripts.h"
+#include "Scripting/IRCScript.h"
+#include "Scripting/ScriptMgr.h"
 
 #include "App.h"

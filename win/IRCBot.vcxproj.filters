@@ -10,6 +10,12 @@
     <Filter Include="IRC">
       <UniqueIdentifier>{ee8b6ef6-94d6-40b5-8c7c-e148dd65e8a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripting">
+      <UniqueIdentifier>{c1a697e0-0cf2-49b6-a7f1-46c317584851}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{5a10f73f-c030-44c9-9d4e-704228fd78e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\IRCBot.cpp" />
@@ -39,6 +45,18 @@
     </ClCompile>
     <ClCompile Include="..\src\IRC\User.cpp">
       <Filter>IRC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\ScriptMgr.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\IRCScript.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripting\SetupScripts.cpp">
+      <Filter>Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\Echo.cpp">
+      <Filter>Scripts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +89,15 @@
     </ClInclude>
     <ClInclude Include="..\src\IRC\User.h">
       <Filter>IRC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\ScriptMgr.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\IRCScript.h">
+      <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Scripting\SetupScripts.h">
+      <Filter>Scripting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

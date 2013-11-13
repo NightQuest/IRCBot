@@ -33,7 +33,7 @@ void App::run()
 		}
 
 		// TODO: make this look nicer.
-		irc = move(unique_ptr<IRCClient>(new IRCClient(config.getString("irc.hostname"), config.getUInt("irc.port"), config.getBool("irc.ssl"), config)));
+		irc = unique_ptr<IRCClient>(new IRCClient(config.getString("irc.hostname"), config.getUInt("irc.port"), config.getBool("irc.ssl"), config));
 
 		irc->process();
 

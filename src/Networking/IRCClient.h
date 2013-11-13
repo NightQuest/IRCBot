@@ -18,7 +18,7 @@ struct LineData
 {
 	LineAuthor author;
 	std::string command;
-	std::string param;
+	std::vector<std::string> params;
 	std::string target;
 	std::string data;
 	std::string raw;
@@ -34,19 +34,15 @@ enum botAccess
 class IRCClient : public Socket
 {
 private:
-	std::vector<Channel> channels;
+	std::map<std::string, Channel> channels;
 	std::string activeNickname;
 	const Config& config;
 	std::unique_ptr<MariaDB::Connection> internalDB;
 	std::unique_ptr<MariaDB::Connection> externalDB;
 
-	bool connected;
 	bool sentUser;
 
-	int recvData(char* data, int dataLen);
-	int sendData(const char* data, int dataLen);
-	int sendData(const std::string& data);
-	int sendLine(const std::string& line) { return sendData(line + "\r\n"); }
+	int sendLine(const std::string& line) { return send(line + "\r\n"); }
 	int sendCTCPResponse(const std::string& target, const std::string& ctcp, const std::string& msg) { return sendLine("NOTICE " + target + " :\x1" + ctcp + " " + msg + "\x1"); }
 	int sendCTCP(const std::string& target, const std::string& ctcp) { return sendLine("PRIVMSG " + target + " :\x1" + ctcp + "\x1"); }
 	int sendAction(const std::string& target, const std::string& message) { return sendCTCP(target, "ACTION " + message); }

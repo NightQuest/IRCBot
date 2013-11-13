@@ -212,6 +212,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">preCompiled.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\src\Scripting\IRCScript.cpp" />
+    <ClCompile Include="..\src\Scripting\ScriptMgr.cpp" />
+    <ClCompile Include="..\src\Scripting\SetupScripts.cpp" />
+    <ClCompile Include="..\src\Scripts\Echo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\App.h" />
@@ -226,6 +230,9 @@
     <ClInclude Include="..\src\Networking\IRCClient.h" />
     <ClInclude Include="..\src\Networking\Socket.h" />
     <ClInclude Include="..\src\preCompiled.h" />
+    <ClInclude Include="..\src\Scripting\IRCScript.h" />
+    <ClInclude Include="..\src\Scripting\ScriptMgr.h" />
+    <ClInclude Include="..\src\Scripting\SetupScripts.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\IRCBot.default.conf" />
