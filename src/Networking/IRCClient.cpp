@@ -11,8 +11,8 @@ IRCException::IRCException(const std::string& message, const std::string& detail
 IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config) : Socket(hostname, port, ssl), config(_config), sentUser(false)
 {
 	connected = (hSock != INVALID_SOCKET);
-	internalDB = move(unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true)));
-	externalDB = move(unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true)));
+	internalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
+	externalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
 }
 
 IRCClient::~IRCClient()
