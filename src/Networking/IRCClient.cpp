@@ -230,7 +230,9 @@ void IRCClient::handleSCommand(const LineData& data)
 			else
 				sScriptMgr->onCTCP(data.author.nickname, data.target, str, "");
 		}
-		sScriptMgr->onChatText(data.author.nickname, data.target, data.data);
+		else
+			sScriptMgr->onChatText(data.author.nickname, data.target, data.data);
+
 		handlePRIVMSG(data);
 	}
 
