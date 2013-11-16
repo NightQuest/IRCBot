@@ -8,17 +8,14 @@ IRCException::IRCException(const std::string& message, const std::string& detail
 {
 }
 
-IRCClient::IRCClient(const std::string& hostname, unsigned int port, bool ssl, const Config& _config) : Socket(hostname, port, ssl), config(_config), sentUser(false)
+IRCClient::IRCClient(const Config& _config) : config(_config), sentUser(false)
 {
-	connected = (hSock.socketHandle != INVALID_SOCKET);
-	internalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
-	externalDB = unique_ptr<MariaDB::Connection>(new MariaDB::Connection(true));
 }
 
 IRCClient::~IRCClient()
 {
-	if( connected )
-		sendLine("QUIT :" + config.getString("irc.quitmessage"));
+	if( sSock->isConnected() )
+		sSock->sendQuit(config.getString("irc.quitmessage"));
 
 	sScriptMgr->unregisterAll();
 }
@@ -88,50 +85,15 @@ LineData IRCClient::parseLine(const std::string& line) const
 
 void IRCClient::process()
 {
-	cout << "Establishing internal database connection... ";
-	if( !internalDB->open(config.getString("database.internal.hostname"), config.getString("database.internal.username"),
-		config.getString("database.internal.password"), config.getUInt("database.internal.port"), config.getString("database.internal.defaultdb")) )
+	setupScripts();
+
+	std::string line;
+	while( sSock->getLine(line) )
 	{
-		cout << "Failed" << endl;
-		internalDB.reset();
-	}
-	else
-		cout << "OK" << endl;
-	
-	cout << "Establishing external database connection... ";
-	if( !externalDB->open(config.getString("database.external.hostname"), config.getString("database.external.username"),
-		config.getString("database.external.password"), config.getUInt("database.external.port"), config.getString("database.external.defaultdb")) )
-	{
-		cout << "Failed" << endl;
-		externalDB.reset();
-	}
-	else
-		cout << "OK" << endl;
-
-	setupScripts(hSock);
-
-	vector<char> recvBuff(1024);
-	while( connected )
-	{
-		int ret = recv(&recvBuff[0], 1024);
-		if( ret <= 0 )
-			return;
-
-		istringstream iss(recvBuff.data());
-		string line;
-		while( getline(iss, line) )
-		{
-			if( line.empty() )
-				continue;
-
-			if (line[line.size() - 1] == '\r')
-				line.resize(line.size() - 1);
-
-			LineData data = parseLine(line);
-			if( !data.command.empty() )
-				handleSCommand(data);
-		}
-		std::memset(&recvBuff[0], 0, 1024);
+		LineData data = parseLine(line);
+		if( !data.command.empty() )
+			handleSCommand(data);
+		line.clear();
 	}
 }
 
@@ -142,7 +104,7 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	if( data.command == "PING" )
 	{
-		sendLine("PONG :" + data.data);
+		sSock->sendLine("PONG :" + data.data);
 		cout << "PING <-> PONG" << endl;
 
 		if( externalDB && externalDB->keepAlive )
@@ -253,23 +215,24 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 {
 	if( command == "quit" && hasAccess(data.author.full, ACCESS_QUIT) )
 	{
-		sendLine("QUIT :" + config.getString("irc.quitmessage"));
+		sSock->sendQuit(config.getString("irc.quitmessage"));
 	}
 
 	else if( command == "exit" && hasAccess(data.author.full, ACCESS_QUIT) )
 	{
-		sendLine("QUIT :" + config.getString("irc.quitmessage"));
+		sScriptMgr->unregisterAll();
+		sSock->sendQuit(config.getString("irc.quitmessage"));
 		exit(0);
 	}
 
 	else if( command == "say" && hasAccess(data.author.full, ACCESS_SAY) )
 	{
-		sendMessage(data.target, args);
+		sSock->sendMessage(data.target, args);
 	}
 
 	else if( command == "me" && hasAccess(data.author.full, ACCESS_SAY) )
 	{
-		sendAction(data.target, args);
+		sSock->sendAction(data.target, args);
 	}
 
 	else if( command == "sql" && hasAccess(data.author.full, ACCESS_SQL) && externalDB )
@@ -291,11 +254,11 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 					ss << (*row)[x].getString();
 				}
 
-				sendMessage(data.target, ss.str());
+				sSock->sendMessage(data.target, ss.str());
 			}
 		}
 		else
-			sendMessage(data.target, "No results");
+			sSock->sendMessage(data.target, "No results");
 	}
 }
 
@@ -328,7 +291,7 @@ void IRCClient::handleNOTICE(const LineData& data)
 {
 	if( !sentUser && data.target == "AUTH" && data.data.find("*** Found") != string::npos ) // we're connecting
 	{
-		sendLine("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name"));
+		sSock->sendLine("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name"));
 		setNick(config.getString("irc.nickname"));
 	}
 }
@@ -347,7 +310,7 @@ void IRCClient::handleCTCP(const LineData& data)
 		query = data.data.substr(1, data.data.length()-2);
 
 	if( query == "VERSION" )
-		sendCTCPResponse(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
+		sSock->sendCTCPResponse(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
 }
 
 bool IRCClient::hasAccess(const std::string& user, unsigned int perm)
@@ -368,16 +331,16 @@ bool IRCClient::hasAccess(const std::string& user, unsigned int perm)
 
 void IRCClient::setNick(const std::string& newNick)
 {
-	if( connected && sendLine("NICK " + newNick) > 0 )
-		activeNickname = newNick;
+	sSock->sendLine("NICK " + newNick);
+	activeNickname = newNick;
 }
 
 void IRCClient::joinChannel(const std::string& channel)
 {
-	if( !connected || channel.empty() )
+	if( !sSock->isConnected() || channel.empty() )
 		return;
 
-	if( sendLine("JOIN " + channel) > 0 )
+	if( sSock->sendLine("JOIN " + channel) > 0 )
 	{
 		istringstream iss(channel);
 		string chan;

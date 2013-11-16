@@ -97,7 +97,7 @@ int Socket::send(const std::string& data) throw(SocketException)
 
 	int ret = 0;
 	if( hSock.useSSL )
-		ret = SSL_write(hSock.sslHandle, data.c_str(), static_cast<int>(data.size()));
+		ret = SSL_write(hSock.sslHandle, data.c_str(), static_cast<int>(data.length()));
 	else
 		ret = ::send(hSock.socketHandle, data.c_str(), static_cast<int>(data.length()), 0);
 

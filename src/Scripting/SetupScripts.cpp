@@ -1,8 +1,8 @@
 #include "preCompiled.h"
 
-void setupEcho(const SocketDesc& sock);
+void setupEcho();
 
-void setupScripts(const SocketDesc& sock)
+void setupScripts()
 {
-	setupEcho(sock);
+	setupEcho();
 }

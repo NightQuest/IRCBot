@@ -19,3 +19,6 @@ public:
 
 	void run();
 };
+
+extern std::unique_ptr<MariaDB::Connection> internalDB;
+extern std::unique_ptr<MariaDB::Connection> externalDB;

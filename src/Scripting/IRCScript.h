@@ -1,18 +1,12 @@
 #pragma once
 
-class IRCScript : public Socket
+class IRCScript
 {
 private:
 	std::string scriptName;
 
 protected:
-	IRCScript(const std::string& _scriptName, const SocketDesc& sock);
-
-	int sendLine(const std::string& line) { return send(line + "\r\n"); }
-	int sendCTCPResponse(const std::string& target, const std::string& ctcp, const std::string& msg) { return sendLine("NOTICE " + target + " :\x1" + ctcp + " " + msg + "\x1"); }
-	int sendCTCP(const std::string& target, const std::string& ctcp) { return sendLine("PRIVMSG " + target + " :\x1" + ctcp + "\x1"); }
-	int sendAction(const std::string& target, const std::string& message) { return sendCTCP(target, "ACTION " + message); }
-	int sendMessage(const std::string& target, const std::string& message) { return sendLine("PRIVMSG " + target + " :" + message); }
+	IRCScript(const std::string& _scriptName);
 
 public:
 	virtual ~IRCScript();

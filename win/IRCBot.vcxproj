@@ -201,6 +201,7 @@
     <ClCompile Include="..\src\MariaDB\QueryRow.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRowField.cpp" />
     <ClCompile Include="..\src\Networking\IRCClient.cpp" />
+    <ClCompile Include="..\src\Networking\IRCSocket.cpp" />
     <ClCompile Include="..\src\Networking\Socket.cpp" />
     <ClCompile Include="..\src\preCompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -228,6 +229,7 @@
     <ClInclude Include="..\src\MariaDB\QueryRow.h" />
     <ClInclude Include="..\src\MariaDB\QueryRowField.h" />
     <ClInclude Include="..\src\Networking\IRCClient.h" />
+    <ClInclude Include="..\src\Networking\IRCSocket.h" />
     <ClInclude Include="..\src\Networking\Socket.h" />
     <ClInclude Include="..\src\preCompiled.h" />
     <ClInclude Include="..\src\Scripting\IRCScript.h" />

@@ -58,6 +58,9 @@
     <ClCompile Include="..\src\Scripts\Echo.cpp">
       <Filter>Scripts</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Networking\IRCSocket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -98,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Scripting\SetupScripts.h">
       <Filter>Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Networking\IRCSocket.h">
+      <Filter>Networking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

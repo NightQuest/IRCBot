@@ -33,11 +33,11 @@ protected:
 	
 	Socket(const std::string& addr, unsigned int port, bool _useSSL = false) throw(SocketException);
 
+	bool usingSSL() const { return hSock.useSSL; }
+
 	int send(const std::string& data) throw(SocketException);
 	int send(const char* data, int dataLen) throw(SocketException);
 	int recv(char* buffer, int bufferLen) throw(SocketException);
-
-	bool usingSSL() const { return hSock.useSSL; }
 
 public:
 	Socket(const SocketDesc& _sock) : hSock(_sock) { }

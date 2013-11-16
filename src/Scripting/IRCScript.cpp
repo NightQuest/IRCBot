@@ -1,6 +1,6 @@
 #include "preCompiled.h"
 
-IRCScript::IRCScript(const std::string& _scriptName, const SocketDesc& sock) : Socket(sock), scriptName(_scriptName)
+IRCScript::IRCScript(const std::string& _scriptName) : scriptName(_scriptName)
 {
 	sScriptMgr->registerScript(_scriptName, this);
 }

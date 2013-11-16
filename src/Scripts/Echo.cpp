@@ -3,7 +3,7 @@
 class echo : public IRCScript
 {
 public:
-	echo(const SocketDesc& sock) : IRCScript("echo", sock) { }
+	echo() : IRCScript("echo") { }
 	
 	void onChatText(const std::string& user, const std::string& target, const std::string& message)
 	{
@@ -24,7 +24,7 @@ public:
 	}
 };
 
-void setupEcho(const SocketDesc& sock)
+void setupEcho()
 {
-	new echo(sock);
+	new echo();
 }
