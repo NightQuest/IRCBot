@@ -40,6 +40,9 @@ bool MariaDB::Connection::open(const std::string& hostname, const std::string& u
 	if( !conn && !(conn = mysql_init(nullptr)) )
 		return false;
 
+	my_bool reconnect = 1;
+	mysql_options(conn, MYSQL_OPT_RECONNECT, &reconnect);
+
 	if( !mysql_real_connect(conn, hostname.c_str(), username.c_str(), password.c_str(), database.c_str(), port, nullptr, flags) )
 		return false;
 
