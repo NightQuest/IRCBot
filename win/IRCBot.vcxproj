@@ -217,6 +217,7 @@
     <ClCompile Include="..\src\Scripting\ScriptMgr.cpp" />
     <ClCompile Include="..\src\Scripting\SetupScripts.cpp" />
     <ClCompile Include="..\src\Scripts\Echo.cpp" />
+    <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\App.h" />
@@ -235,6 +236,7 @@
     <ClInclude Include="..\src\Scripting\IRCScript.h" />
     <ClInclude Include="..\src\Scripting\ScriptMgr.h" />
     <ClInclude Include="..\src\Scripting\SetupScripts.h" />
+    <ClInclude Include="..\src\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\IRCBot.default.conf" />

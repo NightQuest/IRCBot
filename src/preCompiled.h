@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <deque>
 #include <fstream>
 #include <algorithm>
 #include <chrono>
@@ -16,6 +17,7 @@
 
 using namespace std;
 
+#include "Util.h"
 #include "Config/Config.h"
 #include "MariaDB/MariaDB.h"
 #include "Networking/Socket.h"

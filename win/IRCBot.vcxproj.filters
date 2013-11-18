@@ -61,6 +61,7 @@
     <ClCompile Include="..\src\Networking\IRCSocket.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="..\src\Networking\IRCSocket.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\IRCBot.default.conf" />
