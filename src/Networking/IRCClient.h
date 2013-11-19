@@ -7,16 +7,9 @@ public:
 	IRCException(const std::string& message, const std::string& detail) throw();
 };
 
-struct LineAuthor
-{
-	std::string nickname;
-	std::string ident;
-	std::string hostname;
-	std::string full;
-};
 struct LineData
 {
-	LineAuthor author;
+	std::shared_ptr<User> author;
 	std::string command;
 	std::vector<std::string> params;
 	std::string target;
@@ -47,8 +40,6 @@ private:
 	void handlePRIVMSG(const LineData& data);
 	void handleNOTICE(const LineData& data);
 	void handleCTCP(const LineData& data);
-
-	bool hasAccess(const std::string& user, unsigned int perm);
 
 	void setNick(const std::string& newNick);
 	void joinChannel(const std::string& channel);

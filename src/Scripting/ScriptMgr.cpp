@@ -49,32 +49,32 @@ IRCScript* ScriptMgr::operator[](const std::string& scriptName)
 	return pos->second;
 }
 
-void ScriptMgr::onJoin(const std::string& channel, const std::string& user)
+void ScriptMgr::onJoin(const std::shared_ptr<User>& user, const std::string& channel)
 {
-	all_scripts()->onJoin(channel, user);
+	all_scripts()->onJoin(user, channel);
 }
 
-void ScriptMgr::onPart(const std::string& channel, const std::string& user, const std::string& message)
+void ScriptMgr::onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message)
 {
-	all_scripts()->onPart(channel, user, message);
+	all_scripts()->onPart(user, channel, message);
 }
 
-void ScriptMgr::onQuit(const std::string& user, const std::string& message)
+void ScriptMgr::onQuit(const std::shared_ptr<User>& user, const std::string& message)
 {
 	all_scripts()->onQuit(user, message);
 }
 
-void ScriptMgr::onChatText(const std::string& user, const std::string& target, const std::string& message)
+void ScriptMgr::onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onChatText(user, target, message);
 }
 
-void ScriptMgr::onCTCP(const std::string& user, const std::string& target, const std::string& ctcp, const std::string& message)
+void ScriptMgr::onCTCP(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)
 {
 	all_scripts()->onCTCP(user, target, ctcp, message);
 }
 
-void ScriptMgr::onChatAction(const std::string& user, const std::string& target, const std::string& message)
+void ScriptMgr::onChatAction(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onChatAction(user, target, message);
 }

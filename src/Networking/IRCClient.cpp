@@ -44,18 +44,20 @@ LineData IRCClient::parseLine(const std::string& line) const
 		// All else
 		size_t pos, pos2;
 
-		data.author.full = lineParts[0].substr(1); // drop the :
-		pos = data.author.full.find_first_of('!');
+		std::string full, nickname, ident, hostname;
+		full = lineParts[0].substr(1); // drop the :
+		pos = full.find_first_of('!');
 		if( pos != string::npos )
-			data.author.nickname = data.author.full.substr(0, pos);
+			nickname = full.substr(0, pos);
 		pos2 = lineParts[0].find_first_of('@');
 		if( pos2 != string::npos )
 		{
 			if( pos != string::npos )
-				data.author.ident = data.author.full.substr(++pos, (pos2-1)-pos);
+				ident = full.substr(++pos, (pos2-1)-pos);
 
-			data.author.hostname = data.author.full.substr(pos2);
+			hostname = full.substr(pos2);
 		}
+		data.author.reset(new User(nickname, ident, hostname));
 
 		data.command = lineParts[1];
 		data.target = lineParts[2];
@@ -148,7 +150,7 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "MODE" )
 	{
-		cout << "M " << data.author.nickname << " -> " << data.target << ":";
+		cout << "M " << data.author->getNickname() << " -> " << data.target << ":";
 		for( const string& str : data.params )
 			cout << " " << str;
 		cout << endl;
@@ -156,17 +158,17 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "JOIN" )
 	{
-		cout << "J " << data.author.nickname << " -> " << data.target << endl;
+		cout << "J " << data.author->getNickname() << " -> " << data.target << endl;
 	}
 
 	else if( data.command == "PART" )
 	{
-		cout << "P " << data.author.nickname << " -> " << data.target << endl;
+		cout << "P " << data.author->getNickname() << " -> " << data.target << endl;
 	}
 
 	else if( data.command == "QUIT" )
 	{
-		cout << "Q " << data.author.nickname;
+		cout << "Q " << data.author->getNickname();
 		if( data.data.empty() )
 			cout << endl;
 		else
@@ -184,16 +186,16 @@ void IRCClient::handleSCommand(const LineData& data)
 				string ctcp = str.substr(0, pos);
 				string args = str.substr(++pos);
 				
-				sScriptMgr->onCTCP(data.author.nickname, data.target, ctcp, args);
+				sScriptMgr->onCTCP(data.author, data.target, ctcp, args);
 
 				if( ctcp == "ACTION" )
-					sScriptMgr->onChatAction(data.author.nickname, data.target, args);
+					sScriptMgr->onChatAction(data.author, data.target, args);
 			}
 			else
-				sScriptMgr->onCTCP(data.author.nickname, data.target, str, "");
+				sScriptMgr->onCTCP(data.author, data.target, str, "");
 		}
 		else
-			sScriptMgr->onChatText(data.author.nickname, data.target, data.data);
+			sScriptMgr->onChatText(data.author, data.target, data.data);
 
 		handlePRIVMSG(data);
 	}
@@ -203,7 +205,7 @@ void IRCClient::handleSCommand(const LineData& data)
 		if( data.target == "AUTH" )
 			cout << "N " << data.target << ": " << data.data << endl;
 		else
-			cout << "N " << data.author.nickname << " -> " << data.target << ": " << data.data << endl;
+			cout << "N " << data.author->getNickname() << " -> " << data.target << ": " << data.data << endl;
 		handleNOTICE(data);
 	}
 
@@ -213,29 +215,29 @@ void IRCClient::handleSCommand(const LineData& data)
 
 void IRCClient::handleCCommand(const std::string& command, const std::string& args, const LineData& data)
 {
-	if( command == "quit" && hasAccess(data.author.full, ACCESS_QUIT) )
+	if( command == "quit" && data.author->hasAccess(ACCESS_QUIT) )
 	{
 		sSock->sendQuit(config.getString("irc.quitmessage"));
 	}
 
-	else if( command == "exit" && hasAccess(data.author.full, ACCESS_QUIT) )
+	else if( command == "exit" && data.author->hasAccess(ACCESS_QUIT) )
 	{
 		sScriptMgr->unregisterAll();
 		sSock->sendQuit(config.getString("irc.quitmessage"));
 		exit(0);
 	}
 
-	else if( command == "say" && hasAccess(data.author.full, ACCESS_SAY) )
+	else if( command == "say" && data.author->hasAccess(ACCESS_SAY) )
 	{
 		sSock->sendMessage(data.target, args);
 	}
 
-	else if( command == "me" && hasAccess(data.author.full, ACCESS_SAY) )
+	else if( command == "me" && data.author->hasAccess(ACCESS_SAY) )
 	{
 		sSock->sendAction(data.target, args);
 	}
 
-	else if( command == "sql" && hasAccess(data.author.full, ACCESS_SQL) && externalDB )
+	else if( command == "sql" && data.author->hasAccess(ACCESS_SQL) && externalDB )
 	{
 		MariaDB::QueryResult res = externalDB->query(args);
 		if( res && res->getRowCount() != 0 )
@@ -310,23 +312,7 @@ void IRCClient::handleCTCP(const LineData& data)
 		query = data.data.substr(1, data.data.length()-2);
 
 	if( query == "VERSION" )
-		sSock->sendCTCPResponse(data.author.nickname, "VERSION", config.getString("irc.ctcpversion"));
-}
-
-bool IRCClient::hasAccess(const std::string& user, unsigned int perm)
-{
-	if( user.empty() || perm == 0 || !internalDB )
-		return false;
-
-	MariaDB::QueryResult res = internalDB->query("SELECT `access` FROM `perms` WHERE `user` = '" + user + "';");
-	if( res && res->getRowCount() != 0 )
-	{
-		MariaDB::QueryRow* row;
-		if( res->nextRow() && (row = res->getRow()) )
-			return ((*row)["access"].getUInt32() & perm) == perm;
-	}
-
-	return false;
+		sSock->sendCTCPResponse(data.author->getNickname(), "VERSION", config.getString("irc.ctcpversion"));
 }
 
 void IRCClient::setNick(const std::string& newNick)
