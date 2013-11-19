@@ -253,7 +253,12 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 				{
 					if( x > 0 && x < rowCount )
 						ss << ", ";
-					ss << (*row)[x].getString();
+
+					std::string str = (*row)[x].getString();
+					if( str.empty() )
+						ss << "NULL";
+					else
+						ss << str;
 				}
 
 				sSock->sendMessage(data.target, ss.str());
