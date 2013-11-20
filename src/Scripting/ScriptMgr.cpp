@@ -49,6 +49,11 @@ IRCScript* ScriptMgr::operator[](const std::string& scriptName)
 	return pos->second;
 }
 
+void ScriptMgr::onWelcome(const std::string& message)
+{
+	all_scripts()->onWelcome(message);
+}
+
 void ScriptMgr::onJoin(const std::shared_ptr<User>& user, const std::string& channel)
 {
 	all_scripts()->onJoin(user, channel);
@@ -64,9 +69,19 @@ void ScriptMgr::onQuit(const std::shared_ptr<User>& user, const std::string& mes
 	all_scripts()->onQuit(user, message);
 }
 
+void ScriptMgr::onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+{
+	all_scripts()->onNotice(user, target, message);
+}
+
 void ScriptMgr::onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onChatText(user, target, message);
+}
+
+void ScriptMgr::onCTCPReply(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)
+{
+	all_scripts()->onCTCPReply(user, target, ctcp, message);
 }
 
 void ScriptMgr::onCTCP(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)

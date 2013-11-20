@@ -10,7 +10,6 @@ public:
 class App
 {
 private:
-	Config config;
 	std::unique_ptr<IRCClient> irc;
 
 public:
@@ -22,3 +21,4 @@ public:
 
 extern std::unique_ptr<MariaDB::Connection> internalDB;
 extern std::unique_ptr<MariaDB::Connection> externalDB;
+extern std::unique_ptr<Config> config;

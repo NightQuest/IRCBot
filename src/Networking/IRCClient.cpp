@@ -8,14 +8,14 @@ IRCException::IRCException(const std::string& message, const std::string& detail
 {
 }
 
-IRCClient::IRCClient(const Config& _config) : config(_config), sentUser(false)
+IRCClient::IRCClient()
 {
 }
 
 IRCClient::~IRCClient()
 {
 	if( sSock->isConnected() )
-		sSock->sendQuit(config.getString("irc.quitmessage"));
+		sSock->sendQuit(config->getString("irc.quitmessage"));
 
 	sScriptMgr->unregisterAll();
 }
@@ -115,11 +115,8 @@ void IRCClient::handleSCommand(const LineData& data)
 			internalDB->ping();
 	}
 
-	else if( data.command == "001" ) // Welcome
-	{
-		sentUser = true;
-		cout << data.raw << endl;
-	}
+	else if( data.command == "001" ) // RPL_WELCOME
+		sScriptMgr->onWelcome(data.raw);
 
 	else if( data.command == "372" ) // MOTD
 	{
@@ -133,13 +130,13 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "376" ) // end of /MOTD
 	{
-		joinChannel(config.getString("irc.channels"));
+		joinChannel(config->getString("irc.channels"));
 		cout << "MOTD: " << data.data << endl;
 	}
 
-	else if( data.command == "433" && activeNickname == config.getString("irc.nickname") ) // Nickname in use
+	else if( data.command == "433" && sSock->getNickname() == config->getString("irc.nickname") ) // Nickname in use
 	{
-		setNick(config.getString("irc.altnickname"));
+		sSock->setNickname(config->getString("irc.altnickname"));
 		cout << "E " << data.data << endl;
 	}
 
@@ -157,56 +154,53 @@ void IRCClient::handleSCommand(const LineData& data)
 	}
 
 	else if( data.command == "JOIN" )
-	{
-		cout << "J " << data.author->getNickname() << " -> " << data.target << endl;
-	}
+		sScriptMgr->onJoin(data.author, data.data);
 
 	else if( data.command == "PART" )
-	{
-		cout << "P " << data.author->getNickname() << " -> " << data.target << endl;
-	}
+		sScriptMgr->onPart(data.author, data.target, data.data);
 
 	else if( data.command == "QUIT" )
-	{
-		cout << "Q " << data.author->getNickname();
-		if( data.data.empty() )
-			cout << endl;
-		else
-			cout << ": " << data.data << endl;
-	}
+		sScriptMgr->onQuit(data.author, data.data);
 
 	else if( data.command == "PRIVMSG" )
 	{
 		if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
 		{
 			string str = data.data.substr(1, data.data.length()-2);
+			string ctcp = str;
+			string args = "";
 			size_t pos = str.find_first_of(' ');
 			if( pos != string::npos )
 			{
-				string ctcp = str.substr(0, pos);
-				string args = str.substr(++pos);
-				
-				sScriptMgr->onCTCP(data.author, data.target, ctcp, args);
+				ctcp = str.substr(0, pos);
+				args = str.substr(++pos);
 
 				if( ctcp == "ACTION" )
 					sScriptMgr->onChatAction(data.author, data.target, args);
 			}
-			else
-				sScriptMgr->onCTCP(data.author, data.target, str, "");
+			sScriptMgr->onCTCP(data.author, data.target, ctcp, args);
 		}
 		else
 			sScriptMgr->onChatText(data.author, data.target, data.data);
-
-		handlePRIVMSG(data);
 	}
 
 	else if( data.command == "NOTICE" )
 	{
-		if( data.target == "AUTH" )
-			cout << "N " << data.target << ": " << data.data << endl;
+		if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
+		{
+			string str = data.data.substr(1, data.data.length()-2);
+			string ctcp = str;
+			string args = "";
+			size_t pos = str.find_first_of(' ');
+			if( pos != string::npos )
+			{
+				ctcp = str.substr(0, pos);
+				args = str.substr(++pos);
+			}
+			sScriptMgr->onCTCPReply(data.author, data.target, ctcp, args);
+		}
 		else
-			cout << "N " << data.author->getNickname() << " -> " << data.target << ": " << data.data << endl;
-		handleNOTICE(data);
+			sScriptMgr->onNotice(data.author, data.target, data.data);
 	}
 
 	else
@@ -217,13 +211,13 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 {
 	if( command == "quit" && data.author->hasAccess(ACCESS_QUIT) )
 	{
-		sSock->sendQuit(config.getString("irc.quitmessage"));
+		sSock->sendQuit(config->getString("irc.quitmessage"));
 	}
 
 	else if( command == "exit" && data.author->hasAccess(ACCESS_QUIT) )
 	{
 		sScriptMgr->unregisterAll();
-		sSock->sendQuit(config.getString("irc.quitmessage"));
+		sSock->sendQuit(config->getString("irc.quitmessage"));
 		exit(0);
 	}
 
@@ -267,63 +261,6 @@ void IRCClient::handleCCommand(const std::string& command, const std::string& ar
 		else
 			sSock->sendMessage(data.target, "No results");
 	}
-}
-
-void IRCClient::handlePRIVMSG(const LineData& data)
-{
-	if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
-		handleCTCP(data);
-
-	else if( data.target != activeNickname )
-	{
-		if ( data.data[0] == '!' )
-		{
-			string command, args;
-
-			size_t pos = data.data.find_first_of(' ');
-			if( pos != string::npos )
-			{
-				command = data.data.substr(1, pos-1);
-				args = data.data.substr(pos+1);
-			}
-			else
-				command = data.data.substr(1, data.data.length()-1);
-
-			handleCCommand(command, args, data);
-		}
-	}
-}
-
-void IRCClient::handleNOTICE(const LineData& data)
-{
-	if( !sentUser && data.target == "AUTH" && data.data.find("*** Found") != string::npos ) // we're connecting
-	{
-		sSock->sendLine("USER " + config.getString("irc.name") + " 8 * :" + config.getString("irc.name"));
-		setNick(config.getString("irc.nickname"));
-	}
-}
-
-void IRCClient::handleCTCP(const LineData& data)
-{
-	string query, args;
-
-	size_t pos = data.data.find(' ');
-	if( pos != string::npos )
-	{
-		query = data.data.substr(1, pos-1);
-		args = data.data.substr(++pos, data.data.length()-pos);
-	}
-	else
-		query = data.data.substr(1, data.data.length()-2);
-
-	if( query == "VERSION" )
-		sSock->sendCTCPResponse(data.author->getNickname(), "VERSION", config.getString("irc.ctcpversion"));
-}
-
-void IRCClient::setNick(const std::string& newNick)
-{
-	sSock->sendLine("NICK " + newNick);
-	activeNickname = newNick;
 }
 
 void IRCClient::joinChannel(const std::string& channel)

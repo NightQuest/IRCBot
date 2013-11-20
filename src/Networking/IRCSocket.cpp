@@ -7,6 +7,13 @@ IRCSocket::IRCSocket(const std::string& addr, unsigned int port, bool _useSSL) :
 	connected = (hSock.socketHandle != INVALID_SOCKET);
 }
 
+void IRCSocket::setNickname(const std::string& nickname)
+{
+	 sendLine("NICK " + nickname);
+	 prevNickname = activeNickname;
+	 activeNickname = nickname;
+}
+
 bool IRCSocket::getLine(std::string& line)
 {
 	vector<char> in(1024);

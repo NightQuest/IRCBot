@@ -4,22 +4,43 @@ class echo : public IRCScript
 {
 public:
 	echo() : IRCScript("echo") { }
-	
-	void onChatText(const std::string& user, const std::string& target, const std::string& message)
+
+	void onQuit(const std::shared_ptr<User>& user, const std::string& message)
 	{
-		cout << "P " << user << " -> " << target << ": " << message << endl;
+		cout << "Q " << user->getNickname();
+		if( !message.empty() )
+			cout << ": " << message;
+		cout << endl;
 	}
 
-	void onChatAction(const std::string& user, const std::string& target, const std::string& message)
+	void onJoin(const std::shared_ptr<User>& user, const std::string& channel)
 	{
-		cout << "A " << user << " -> " << target << ": " << message << endl;
+		cout << "J " << user->getNickname() << " -> " << channel << endl;
 	}
 
-	void onCTCP(const std::string& user, const std::string& target, const std::string& ctcp, const std::string& message)
+	void onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message)
+	{
+		cout << "P " << user->getNickname() << " -> " << channel;
+		if( !message.empty() )
+			cout << ": " << message;
+		cout << endl;
+	}
+
+	void onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+	{
+		cout << "T " << user->getNickname() << " -> " << target << ": " << message << endl;
+	}
+
+	void onChatAction(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+	{
+		cout << "A " << user->getNickname() << " -> " << target << ": " << message << endl;
+	}
+
+	void onCTCP(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)
 	{
 		if( ctcp != "ACTION" )
 		{
-			cout << "C:" << ctcp << " " << user << " -> " << target << ": " << message << endl;
+			cout << "C:" << ctcp << " " << user->getNickname() << " -> " << target << ": " << message << endl;
 		}
 	}
 };

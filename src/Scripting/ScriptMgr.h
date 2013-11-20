@@ -15,12 +15,16 @@ public:
 
 	bool isRegistered(const std::string& scriptName);
 	IRCScript* operator[](const std::string& scriptName);
+
+	void onWelcome(const std::string& message);
 	
 	void onJoin(const std::shared_ptr<User>& user, const std::string& channel);
 	void onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message);
 	void onQuit(const std::shared_ptr<User>& user, const std::string& message);
+	void onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message);
 	void onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message);
 	void onCTCP(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message);
+	void onCTCPReply(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message);
 	void onChatAction(const std::shared_ptr<User>& user, const std::string& target, const std::string& message);
 };
 

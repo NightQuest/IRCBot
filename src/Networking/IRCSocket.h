@@ -4,10 +4,15 @@ class IRCSocket : public Socket
 {
 private:
 	std::vector<char> recvBuff;
+	std::string activeNickname;
+	std::string prevNickname;
 
 public:
 	IRCSocket(const std::string& addr, unsigned int port, bool _useSSL = false);
 	IRCSocket();
+
+	void setNickname(const std::string& nickname);
+	std::string getNickname() { return activeNickname; }
 
 	bool getLine(std::string& line);
 	int sendLine(const std::string& line);

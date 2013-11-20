@@ -62,6 +62,15 @@
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Util.cpp" />
+    <ClCompile Include="..\src\Scripts\CommandHandler.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\handleLogin.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\handleCTCP.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />

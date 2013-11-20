@@ -28,24 +28,16 @@ class IRCClient
 {
 private:
 	std::map<std::string, Channel> channels;
-	std::string activeNickname;
-	const Config& config;
-
-	bool sentUser;
-	
 
 	LineData parseLine(const std::string& line) const;
 	void handleSCommand(const LineData& data);
 	void handleCCommand(const std::string& command, const std::string& args, const LineData& data);
-	void handlePRIVMSG(const LineData& data);
-	void handleNOTICE(const LineData& data);
 	void handleCTCP(const LineData& data);
 
-	void setNick(const std::string& newNick);
 	void joinChannel(const std::string& channel);
 
 public:
-	IRCClient(const Config& _config);
+	IRCClient();
 	~IRCClient();
 
 	void process();
