@@ -80,6 +80,9 @@
     <ClCompile Include="..\src\Scripts\handlePing.cpp">
       <Filter>Scripts</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Networking\IdentServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />
@@ -125,6 +128,9 @@
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Util.h" />
+    <ClInclude Include="..\src\Networking\IdentServer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\IRCBot.default.conf" />

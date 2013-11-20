@@ -55,12 +55,12 @@ void App::run()
 {
 	do
 	{
-		if( config->getBool("irc.useident") )
+		if( config->getBool("ident.enable") )
 		{
-			/* launch an ident listener with a timeout */
+			IdentServer serv(config->getUInt("ident.listenport"));
+			serv.runWithTimeout(config->getString("irc.name"), 60);
 		}
 
-		// TODO: make this look nicer.
 		string hostname = config->getString("irc.hostname");
 		unsigned int port = config->getUInt("irc.port");
 		bool useSSL = config->getBool("irc.ssl");

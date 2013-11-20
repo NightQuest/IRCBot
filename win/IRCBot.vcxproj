@@ -200,6 +200,7 @@
     <ClCompile Include="..\src\MariaDB\QueryResult.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRow.cpp" />
     <ClCompile Include="..\src\MariaDB\QueryRowField.cpp" />
+    <ClCompile Include="..\src\Networking\IdentServer.cpp" />
     <ClCompile Include="..\src\Networking\IRCClient.cpp" />
     <ClCompile Include="..\src\Networking\IRCSocket.cpp" />
     <ClCompile Include="..\src\Networking\Socket.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="..\src\MariaDB\QueryResult.h" />
     <ClInclude Include="..\src\MariaDB\QueryRow.h" />
     <ClInclude Include="..\src\MariaDB\QueryRowField.h" />
+    <ClInclude Include="..\src\Networking\IdentServer.h" />
     <ClInclude Include="..\src\Networking\IRCClient.h" />
     <ClInclude Include="..\src\Networking\IRCSocket.h" />
     <ClInclude Include="..\src\Networking\Socket.h" />

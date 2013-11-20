@@ -24,6 +24,7 @@ using namespace std;
 #include "IRC/User.h"
 #include "IRC/Channel.h"
 #include "Networking/Socket.h"
+#include "Networking/IdentServer.h"
 #include "Networking/IRCSocket.h"
 #include "Scripting/IRCScript.h"
 #include "Networking/IRCClient.h"
