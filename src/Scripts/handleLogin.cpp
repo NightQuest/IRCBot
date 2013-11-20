@@ -35,14 +35,16 @@ public:
 							if( passes.size() == 2 && passes[0] == sSock->getNickname() )
 							{
 								sSock->sendMessage("NickServ", "IDENTIFY " + passes[1]);
-								if( config->getBool("irc.channels.joinwhenidentified") )
-									sSock->joinChannel(config->getString("irc.channels"));
 								break;
 							}
 						}
 					}
 				}
-
+			}
+			else if( message.find("Password accepted") != string::npos || message.find("You are now identified") != string::npos )
+			{
+				if( config->getBool("irc.channels.joinwhenidentified") )
+					sSock->joinChannel(config->getString("irc.channels"));
 			}
 		}
 	}
