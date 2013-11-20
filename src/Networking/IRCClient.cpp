@@ -130,7 +130,8 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "376" ) // end of /MOTD
 	{
-		sSock->joinChannel(config->getString("irc.channels"));
+		if( !config->getBool("irc.channels.joinwhenidentified") )
+			sSock->joinChannel(config->getString("irc.channels"));
 		cout << "MOTD: " << data.data << endl;
 	}
 
