@@ -11,7 +11,7 @@ struct LineData
 {
 	std::shared_ptr<User> author;
 	std::string command;
-	std::vector<std::string> params;
+	std::deque<std::string> params;
 	std::string target;
 	std::string data;
 	std::string raw;

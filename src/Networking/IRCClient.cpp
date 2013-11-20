@@ -63,8 +63,8 @@ LineData IRCClient::parseLine(const std::string& line) const
 		data.target = lineParts[2];
 
 		std::stringstream str;
-		str << lineParts[1];
-		for( int x = 2; x < lineParts.size(); ++x )
+		str << lineParts[1] << " " << lineParts[2];
+		for( int x = 3; x < lineParts.size(); x++ )
 		{
 			if( lineParts[x][0] == ':' )
 			{
