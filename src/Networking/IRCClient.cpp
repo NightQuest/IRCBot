@@ -105,18 +105,10 @@ void IRCClient::handleSCommand(const LineData& data)
 		return;
 
 	if( data.command == "PING" )
-	{
-		sSock->sendLine("PONG :" + data.data);
-		cout << "PING <-> PONG" << endl;
-
-		if( externalDB && externalDB->keepAlive )
-			externalDB->ping();
-		if( internalDB && internalDB->keepAlive )
-			internalDB->ping();
-	}
+		sScriptMgr->onPing(data.data);
 
 	else if( data.command == "001" ) // RPL_WELCOME
-		sScriptMgr->onWelcome(data.raw);
+		sScriptMgr->onWelcome(data.data);
 
 	else if( data.command == "372" ) // MOTD
 	{

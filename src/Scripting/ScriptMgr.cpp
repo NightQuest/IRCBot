@@ -66,6 +66,11 @@ std::vector<ChatCommand> ScriptMgr::getCommands()
 	return commands;
 }
 
+void ScriptMgr::onPing(const std::string& argument)
+{
+	all_scripts()->onPing(argument);
+}
+
 void ScriptMgr::onWelcome(const std::string& message)
 {
 	all_scripts()->onWelcome(message);

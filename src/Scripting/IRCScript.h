@@ -23,6 +23,7 @@ public:
 
 	virtual std::vector<ChatCommand> getCommands() { return std::vector<ChatCommand>(); }
 
+	virtual void onPing(const std::string& argument) { }
 	virtual void onWelcome(const std::string& message) { }
 
 	virtual void onJoin(const std::shared_ptr<User>& user, const std::string& channel) { }

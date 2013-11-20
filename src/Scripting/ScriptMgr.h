@@ -18,6 +18,7 @@ public:
 
 	std::vector<ChatCommand> getCommands();
 
+	void onPing(const std::string& argument);
 	void onWelcome(const std::string& message);
 
 	void onJoin(const std::shared_ptr<User>& user, const std::string& channel);

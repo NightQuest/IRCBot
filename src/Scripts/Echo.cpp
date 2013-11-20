@@ -5,6 +5,11 @@ class echo : public IRCScript
 public:
 	echo() : IRCScript("echo") { }
 
+	void onPing(const std::string& argument)
+	{
+		cout << "PING <-> PONG" << endl;
+	}
+
 	void onQuit(const std::shared_ptr<User>& user, const std::string& message)
 	{
 		cout << "Q " << user->getNickname();
