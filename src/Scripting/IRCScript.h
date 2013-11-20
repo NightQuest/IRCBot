@@ -1,5 +1,15 @@
 #pragma once
 
+typedef void (*ChatCommandFunction)(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments);
+struct ChatCommand
+{
+	std::string command;
+	std::string help;
+	ChatCommandFunction function;
+	unsigned int required_access;
+	vector<ChatCommand> subcommands;
+};
+
 class IRCScript
 {
 private:
@@ -10,6 +20,8 @@ protected:
 
 public:
 	virtual ~IRCScript();
+
+	virtual std::vector<ChatCommand> getCommands() { return std::vector<ChatCommand>(); }
 
 	virtual void onWelcome(const std::string& message) { }
 

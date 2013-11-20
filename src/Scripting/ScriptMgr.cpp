@@ -49,6 +49,23 @@ IRCScript* ScriptMgr::operator[](const std::string& scriptName)
 	return pos->second;
 }
 
+std::vector<ChatCommand> ScriptMgr::getCommands()
+{
+	std::vector<ChatCommand> commands;
+
+	if( !scripts.empty() )
+	{
+		for( auto itr = scripts.begin(); itr != scripts.end(); itr++ )
+		{
+			auto tmp = itr->second->getCommands();
+			if( !tmp.empty() )
+				commands.insert(commands.end(), tmp.begin(), tmp.end());
+		}
+	}
+
+	return commands;
+}
+
 void ScriptMgr::onWelcome(const std::string& message)
 {
 	all_scripts()->onWelcome(message);

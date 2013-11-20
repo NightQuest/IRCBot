@@ -17,24 +17,12 @@ struct LineData
 	std::string raw;
 };
 
-enum botAccess
-{
-	ACCESS_SQL			= 0x00000001,
-	ACCESS_QUIT			= 0x00000002,
-	ACCESS_SAY			= 0x00000004,
-};
-
 class IRCClient
 {
 private:
-	std::map<std::string, Channel> channels;
-
 	LineData parseLine(const std::string& line) const;
 	void handleSCommand(const LineData& data);
-	void handleCCommand(const std::string& command, const std::string& args, const LineData& data);
-	void handleCTCP(const LineData& data);
-
-	void joinChannel(const std::string& channel);
+	bool handleCCommand(const std::vector<ChatCommand>& commands, const std::deque<std::string>& line, const LineData& data);
 
 public:
 	IRCClient();

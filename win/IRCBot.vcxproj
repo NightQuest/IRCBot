@@ -216,10 +216,12 @@
     <ClCompile Include="..\src\Scripting\IRCScript.cpp" />
     <ClCompile Include="..\src\Scripting\ScriptMgr.cpp" />
     <ClCompile Include="..\src\Scripting\SetupScripts.cpp" />
-    <ClCompile Include="..\src\Scripts\CommandHandler.cpp" />
     <ClCompile Include="..\src\Scripts\Echo.cpp" />
     <ClCompile Include="..\src\Scripts\handleCTCP.cpp" />
     <ClCompile Include="..\src\Scripts\handleLogin.cpp" />
+    <ClCompile Include="..\src\Scripts\QuitCommand.cpp" />
+    <ClCompile Include="..\src\Scripts\SayCommand.cpp" />
+    <ClCompile Include="..\src\Scripts\SQLCommand.cpp" />
     <ClCompile Include="..\src\Util.cpp" />
   </ItemGroup>
   <ItemGroup>

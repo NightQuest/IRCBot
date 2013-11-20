@@ -16,8 +16,10 @@ public:
 	bool isRegistered(const std::string& scriptName);
 	IRCScript* operator[](const std::string& scriptName);
 
+	std::vector<ChatCommand> getCommands();
+
 	void onWelcome(const std::string& message);
-	
+
 	void onJoin(const std::shared_ptr<User>& user, const std::string& channel);
 	void onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message);
 	void onQuit(const std::shared_ptr<User>& user, const std::string& message);

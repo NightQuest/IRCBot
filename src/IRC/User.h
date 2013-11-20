@@ -1,5 +1,13 @@
 #pragma once
 
+enum botAccess
+{
+	ACCESS_NONE			= 0x00000000,
+	ACCESS_SQL			= 0x00000001,
+	ACCESS_QUIT			= 0x00000002,
+	ACCESS_SAY			= 0x00000004,
+};
+
 class User
 {
 private:

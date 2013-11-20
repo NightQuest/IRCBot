@@ -130,7 +130,7 @@ void IRCClient::handleSCommand(const LineData& data)
 
 	else if( data.command == "376" ) // end of /MOTD
 	{
-		joinChannel(config->getString("irc.channels"));
+		sSock->joinChannel(config->getString("irc.channels"));
 		cout << "MOTD: " << data.data << endl;
 	}
 
@@ -181,7 +181,15 @@ void IRCClient::handleSCommand(const LineData& data)
 			sScriptMgr->onCTCP(data.author, data.target, ctcp, args);
 		}
 		else
+		{
+			if( config->getString("irc.commandchars").find(data.data[0]) != string::npos )
+			{
+				auto tmp = Util::explode(data.data, ' ');
+				tmp[0] = tmp[0].substr(1); // drop the commandchar
+				handleCCommand(sScriptMgr->getCommands(), tmp, data);
+			}
 			sScriptMgr->onChatText(data.author, data.target, data.data);
+		}
 	}
 
 	else if( data.command == "NOTICE" )
@@ -207,77 +215,27 @@ void IRCClient::handleSCommand(const LineData& data)
 		cout << data.raw << endl;
 }
 
-void IRCClient::handleCCommand(const std::string& command, const std::string& args, const LineData& data)
+bool IRCClient::handleCCommand(const std::vector<ChatCommand>& commands, const std::deque<std::string>& line, const LineData& data)
 {
-	if( command == "quit" && data.author->hasAccess(ACCESS_QUIT) )
-	{
-		sSock->sendQuit(config->getString("irc.quitmessage"));
-	}
+	deque<string> currentLine(line.begin()+1, line.end());
+	string args = Util::implode(currentLine, ' ');
 
-	else if( command == "exit" && data.author->hasAccess(ACCESS_QUIT) )
+	for( auto itr = commands.begin(); itr != commands.end(); itr++ )
 	{
-		sScriptMgr->unregisterAll();
-		sSock->sendQuit(config->getString("irc.quitmessage"));
-		exit(0);
-	}
-
-	else if( command == "say" && data.author->hasAccess(ACCESS_SAY) )
-	{
-		sSock->sendMessage(data.target, args);
-	}
-
-	else if( command == "me" && data.author->hasAccess(ACCESS_SAY) )
-	{
-		sSock->sendAction(data.target, args);
-	}
-
-	else if( command == "sql" && data.author->hasAccess(ACCESS_SQL) && externalDB )
-	{
-		MariaDB::QueryResult res = externalDB->query(args);
-		if( res && res->getRowCount() != 0 )
+		if( itr->command.compare(line[0]) == 0 && data.author->hasAccess(itr->required_access) )
 		{
-			MariaDB::QueryRow* row;
-			int rows = 0;
-			while( rows < 15 && res->nextRow() && (row = res->getRow()) )
+			bool ret = false;
+			if( !itr->subcommands.empty() && !currentLine.empty() )
+				ret = handleCCommand(itr->subcommands, currentLine, data);
+
+			if( !ret )
 			{
-				rows++;
-				stringstream ss;
-				unsigned int rowCount = row->getFieldCount();
-				for( unsigned int x = 0; x < rowCount; x++ )
-				{
-					if( x > 0 && x < rowCount )
-						ss << ", ";
-
-					std::string str = (*row)[x].getString();
-					if( str.empty() )
-						ss << "NULL";
-					else
-						ss << str;
-				}
-
-				sSock->sendMessage(data.target, ss.str());
+				if( itr->function != nullptr )
+					itr->function(data.author, data.target, args);
+				return true;
 			}
 		}
-		else
-			sSock->sendMessage(data.target, "No results");
 	}
-}
 
-void IRCClient::joinChannel(const std::string& channel)
-{
-	if( !sSock->isConnected() || channel.empty() )
-		return;
-
-	if( sSock->sendLine("JOIN " + channel) > 0 )
-	{
-		istringstream iss(channel);
-		string chan;
-		while( getline(iss,chan,',') )
-		{
-			if( chan.empty() )
-				continue;
-
-			channels.insert(make_pair(chan, Channel(chan)));
-		}
-	}
+	return false;
 }

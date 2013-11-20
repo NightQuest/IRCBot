@@ -62,13 +62,19 @@
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Util.cpp" />
-    <ClCompile Include="..\src\Scripts\CommandHandler.cpp">
-      <Filter>Scripts</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Scripts\handleLogin.cpp">
       <Filter>Scripts</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scripts\handleCTCP.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\SayCommand.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\QuitCommand.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scripts\SQLCommand.cpp">
       <Filter>Scripts</Filter>
     </ClCompile>
   </ItemGroup>

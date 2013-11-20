@@ -9,9 +9,39 @@ IRCSocket::IRCSocket(const std::string& addr, unsigned int port, bool _useSSL) :
 
 void IRCSocket::setNickname(const std::string& nickname)
 {
-	 sendLine("NICK " + nickname);
-	 prevNickname = activeNickname;
-	 activeNickname = nickname;
+	if( nickname.empty() )
+		return;
+	sendLine("NICK " + nickname);
+	prevNickname = activeNickname;
+	activeNickname = nickname;
+}
+
+void IRCSocket::joinChannel(const std::string& channel)
+{
+	if( channel.empty() )
+		return;
+
+	deque<string> joinableChans;
+
+	auto chans = Util::explode(channel, ',');
+	for( const string& chan : chans )
+	{
+		bool hasChannel = false;
+		for( const Channel& joinedchan : channels )
+		{
+			if( joinedchan.getName() == chan )
+			{
+				hasChannel = true;
+				break;
+			}
+		}
+
+		if( !hasChannel )
+			joinableChans.push_back(chan);
+	}
+
+	if( !joinableChans.empty() )
+		sendLine("JOIN " + Util::implode(joinableChans, ','));
 }
 
 bool IRCSocket::getLine(std::string& line)

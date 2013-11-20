@@ -6,6 +6,7 @@ private:
 	std::vector<char> recvBuff;
 	std::string activeNickname;
 	std::string prevNickname;
+	std::list<Channel> channels;
 
 public:
 	IRCSocket(const std::string& addr, unsigned int port, bool _useSSL = false);
@@ -13,6 +14,8 @@ public:
 
 	void setNickname(const std::string& nickname);
 	std::string getNickname() { return activeNickname; }
+
+	void joinChannel(const std::string& channel);
 
 	bool getLine(std::string& line);
 	int sendLine(const std::string& line);
