@@ -83,6 +83,9 @@
     <ClCompile Include="..\src\Networking\IdentServer.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Scripts\TemperatureConversion.cpp">
+      <Filter>Scripts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\preCompiled.h" />

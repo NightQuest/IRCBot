@@ -7,6 +7,7 @@ void setupHandlePing();
 void setupQuitCommand();
 void setupSayCommand();
 void setupSQLCommand();
+void setupTemperatureConversion();
 
 void setupScripts()
 {
@@ -17,4 +18,5 @@ void setupScripts()
 	setupQuitCommand();
 	setupSayCommand();
 	setupSQLCommand();
+	setupTemperatureConversion();
 }
