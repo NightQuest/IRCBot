@@ -25,61 +25,76 @@ LineData IRCClient::parseLine(const std::string& line) const
 	LineData data;
 	istringstream iss(line);
 	vector<string> lineParts;
-	string part;
+	string tmpPart;
 
 	data.raw = line;
 
-	while( getline(iss, part, ' ') )
-		if( !part.empty() )
-			lineParts.push_back(part);
+	while( getline(iss, tmpPart, ' ') )
+		if( !tmpPart.empty() )
+			lineParts.push_back(tmpPart);
 
-	if( lineParts.size() >= 2 && lineParts[0][0] != ':' )
+	size_t part = 0;
+	if( lineParts[0][0] == ':' ) // We have an origin
 	{
-		// As far as I know, this only applies to PING
-		data.command = lineParts[0];
-		data.data = lineParts[1].substr(1);
-	}
-	else if( lineParts.size() >= 3 )
-	{
-		// All else
-		size_t pos, pos2;
-
 		std::string full, nickname, ident, hostname;
+
 		full = lineParts[0].substr(1); // drop the :
-		pos = full.find_first_of('!');
+
+		size_t pos = full.find_first_of('@');
 		if( pos != string::npos )
-			nickname = full.substr(0, pos);
-		pos2 = lineParts[0].find_first_of('@');
-		if( pos2 != string::npos )
 		{
-			if( pos != string::npos )
-				ident = full.substr(++pos, (pos2-1)-pos);
-
-			hostname = full.substr(pos2);
-		}
-		data.author.reset(new User(nickname, ident, hostname));
-
-		data.command = lineParts[1];
-		data.target = lineParts[2];
-
-		std::stringstream str;
-		str << lineParts[1] << " " << lineParts[2];
-		for( int x = 3; x < lineParts.size(); x++ )
-		{
-			if( lineParts[x][0] == ':' )
+			hostname = full.substr(pos+1);
+			size_t pos2 = full.find_first_of('!');
+			if( pos2 != string::npos )
 			{
-				str << " :";
-				pos = line.find(str.str());
-				if( pos != string::npos )
-					data.data = line.substr(pos + str.str().length());
-				break;
+				nickname = full.substr(0, pos2);
+				ident = full.substr(pos2+1, (pos-1)-pos2);
 			}
 			else
-			{
-				str << " " << lineParts[x];
-				data.params.push_back(lineParts[x]);
-			}
+				nickname = full.substr(0, pos);
 		}
+		else
+			nickname = full;
+
+		data.author.reset(new User(nickname, ident, hostname));
+		part++;
+	}
+
+	data.command = lineParts[part++];
+
+	for( size_t oldPart = part; part < lineParts.size(); part++ )
+	{
+		if( lineParts[part][0] == ':' ) // message
+		{
+			data.data = lineParts[part++].substr(1);
+			for( ; part < lineParts.size(); part++ )
+				data.data += " " + lineParts[part];
+
+			break;
+		}
+		else
+			data.params.push_back(lineParts[part]);
+	}
+
+	if( data.command == "JOIN" ) // TODO: parse comma delimited list
+		data.target = data.data;
+
+	else if( !data.params.empty() )
+	{
+		data.target = data.params[0];
+		data.params.pop_front();
+	}
+
+	if( data.command == "MODE" && data.data.size() > 0 && data.params.empty() ) // hackfix: move modes to params
+	{
+		// TODO: parse modes
+		iss.str(data.data);
+		iss.clear();
+		while( getline(iss, tmpPart, ' ') )
+			if( !tmpPart.empty() )
+				data.params.push_back(tmpPart);
+
+		data.data.clear();
 	}
 
 	return data;
@@ -147,7 +162,7 @@ void IRCClient::handleSCommand(const LineData& data)
 	}
 
 	else if( data.command == "JOIN" )
-		sScriptMgr->onJoin(data.author, data.data);
+		sScriptMgr->onJoin(data.author, data.target);
 
 	else if( data.command == "PART" )
 		sScriptMgr->onPart(data.author, data.target, data.data);
