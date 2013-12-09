@@ -46,6 +46,10 @@ public:
 				if( config->getBool("irc.channels.joinwhenidentified") )
 					sSock->joinChannel(config->getString("irc.channels"));
 			}
+			else if( message.find("Ghost with your nick has been killed") != string::npos )
+			{
+				sSock->setNickname(config->getString("irc.nickname"));
+			}
 		}
 	}
 
@@ -53,6 +57,27 @@ public:
 	{
 		sentUser = true;
 		cout << message << endl;
+
+		if( sSock->getNickname() != config->getString("irc.nickname") )
+		{
+			string nickPasses = config->getString("irc.nickpasses");
+			if( !nickPasses.empty() )
+			{
+				auto nicksPass = Util::explode(nickPasses, ' ');
+				if( !nicksPass.empty() )
+				{
+					for( const auto& tmp : nicksPass )
+					{
+						auto passes = Util::explode(tmp, ':');
+						if( passes.size() == 2 && passes[0] == config->getString("irc.nickname") )
+						{
+							sSock->sendMessage("NickServ", "GHOST " + config->getString("irc.nickname") + " " + passes[1]);
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 };
 
