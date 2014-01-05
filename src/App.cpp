@@ -66,7 +66,14 @@ void App::run()
 		bool useSSL = config->getBool("irc.ssl");
 
 		irc.reset(new IRCClient());
-		sSock.reset(new IRCSocket(hostname, port, useSSL));
+		try
+		{
+			sSock.reset(new IRCSocket(hostname, port, useSSL));
+		}
+		catch(SocketException& e)
+		{
+			cerr << e.what() << endl;
+		}
 
 		irc->process();
 
