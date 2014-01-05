@@ -36,6 +36,11 @@ public:
 		cout << "T " << user->getNickname() << " -> " << target << ": " << message << endl;
 	}
 
+	void onNick(const std::shared_ptr<User>& user, const std::string& newNick)
+	{
+		cout << "N " << user->getNickname() << " -> " << newNick << endl;
+	}
+
 	void onChatAction(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
 	{
 		cout << "A " << user->getNickname() << " -> " << target << ": " << message << endl;

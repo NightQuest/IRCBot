@@ -91,6 +91,11 @@ void ScriptMgr::onQuit(const std::shared_ptr<User>& user, const std::string& mes
 	all_scripts()->onQuit(user, message);
 }
 
+void ScriptMgr::onNick(const std::shared_ptr<User>& user, const std::string& newNick)
+{
+	all_scripts()->onNick(user, newNick);
+}
+
 void ScriptMgr::onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onNotice(user, target, message);

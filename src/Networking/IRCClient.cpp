@@ -170,6 +170,9 @@ void IRCClient::handleSCommand(const LineData& data)
 	else if( data.command == "QUIT" )
 		sScriptMgr->onQuit(data.author, data.data);
 
+	else if( data.command == "NICK" )
+		sScriptMgr->onNick(data.author, data.data);
+
 	else if( data.command == "PRIVMSG" )
 	{
 		if( data.data[0] == 1 && data.data[data.data.size()-1] == 1 )
