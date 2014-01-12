@@ -22,29 +22,6 @@ App::App()
 		throw AppException("Cannot load IRCBot.conf");
 	}
 	cout << "OK" << endl;
-
-	internalDB.reset(new MariaDB::Connection(true));
-	externalDB.reset(new MariaDB::Connection(true));
-
-	cout << "Establishing internal database connection... ";
-	if( !internalDB->open(config->getString("database.internal.hostname"), config->getString("database.internal.username"),
-		config->getString("database.internal.password"), config->getUInt("database.internal.port"), config->getString("database.internal.defaultdb")) )
-	{
-		cout << "Failed" << endl;
-		internalDB.reset();
-	}
-	else
-		cout << "OK" << endl;
-
-	cout << "Establishing external database connection... ";
-	if( !externalDB->open(config->getString("database.external.hostname"), config->getString("database.external.username"),
-		config->getString("database.external.password"), config->getUInt("database.external.port"), config->getString("database.external.defaultdb")) )
-	{
-		cout << "Failed" << endl;
-		externalDB.reset();
-	}
-	else
-		cout << "OK" << endl;
 }
 
 App::~App()
@@ -55,6 +32,30 @@ void App::run()
 {
 	do
 	{
+		internalDB.reset(new MariaDB::Connection(true));
+		externalDB.reset(new MariaDB::Connection(true));
+
+		cout << "Establishing internal database connection... ";
+		if( !internalDB->open(config->getString("database.internal.hostname"), config->getString("database.internal.username"),
+			config->getString("database.internal.password"), config->getUInt("database.internal.port"), config->getString("database.internal.defaultdb")) )
+		{
+			cout << "Failed" << endl;
+			internalDB.reset();
+		}
+		else
+			cout << "OK" << endl;
+
+		cout << "Establishing external database connection... ";
+		if( !externalDB->open(config->getString("database.external.hostname"), config->getString("database.external.username"),
+			config->getString("database.external.password"), config->getUInt("database.external.port"), config->getString("database.external.defaultdb")) )
+		{
+			cout << "Failed" << endl;
+			externalDB.reset();
+		}
+		else
+			cout << "OK" << endl;
+
+
 		if( config->getBool("ident.enable") )
 		{
 			IdentServer serv(config->getUInt("ident.listenport"));
