@@ -170,6 +170,9 @@ void IRCClient::handleSCommand(const LineData& data)
 	else if( data.command == "QUIT" )
 		sScriptMgr->onQuit(data.author, data.data);
 
+	else if( data.command == "KICK" )
+		sScriptMgr->onKick(data.author, data.target, data.params[0], data.data);
+
 	else if( data.command == "NICK" )
 		sScriptMgr->onNick(data.author, data.data);
 

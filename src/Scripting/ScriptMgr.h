@@ -24,6 +24,7 @@ public:
 	void onJoin(const std::shared_ptr<User>& user, const std::string& channel);
 	void onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message);
 	void onQuit(const std::shared_ptr<User>& user, const std::string& message);
+	void onKick(const std::shared_ptr<User>& user, const std::string& channel, const std::string& target, const std::string& message);
 	void onNick(const std::shared_ptr<User>& user, const std::string& newNick);
 	void onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message);
 	void onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message);

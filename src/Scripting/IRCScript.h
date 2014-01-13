@@ -29,6 +29,7 @@ public:
 	virtual void onJoin(const std::shared_ptr<User>& user, const std::string& channel) { }
 	virtual void onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message) { }
 	virtual void onQuit(const std::shared_ptr<User>& user, const std::string& message) { }
+	virtual void onKick(const std::shared_ptr<User>& user, const std::string& channel, const std::string& target, const std::string& message) { }
 	virtual void onNick(const std::shared_ptr<User>& user, const std::string& newNick) { }
 	virtual void onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message) { }
 	virtual void onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message) { }
