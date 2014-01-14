@@ -76,52 +76,52 @@ void ScriptMgr::onWelcome(const std::string& message)
 	all_scripts()->onWelcome(message);
 }
 
-void ScriptMgr::onJoin(const std::shared_ptr<User>& user, const std::string& channel)
+void ScriptMgr::onJoin(const UserPtr& user, const std::string& channel)
 {
 	all_scripts()->onJoin(user, channel);
 }
 
-void ScriptMgr::onPart(const std::shared_ptr<User>& user, const std::string& channel, const std::string& message)
+void ScriptMgr::onPart(const UserPtr& user, const std::string& channel, const std::string& message)
 {
 	all_scripts()->onPart(user, channel, message);
 }
 
-void ScriptMgr::onQuit(const std::shared_ptr<User>& user, const std::string& message)
+void ScriptMgr::onQuit(const UserPtr& user, const std::string& message)
 {
 	all_scripts()->onQuit(user, message);
 }
 
-void ScriptMgr::onKick(const std::shared_ptr<User>& user, const std::string& channel, const std::string& target, const std::string& message)
+void ScriptMgr::onKick(const UserPtr& user, const std::string& channel, const std::string& target, const std::string& message)
 {
 	all_scripts()->onKick(user, channel, target, message);
 }
 
-void ScriptMgr::onNick(const std::shared_ptr<User>& user, const std::string& newNick)
+void ScriptMgr::onNick(const UserPtr& user, const std::string& newNick)
 {
 	all_scripts()->onNick(user, newNick);
 }
 
-void ScriptMgr::onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+void ScriptMgr::onNotice(const UserPtr& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onNotice(user, target, message);
 }
 
-void ScriptMgr::onChatText(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+void ScriptMgr::onChatText(const UserPtr& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onChatText(user, target, message);
 }
 
-void ScriptMgr::onCTCPReply(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)
+void ScriptMgr::onCTCPReply(const UserPtr& user, const std::string& target, const std::string& ctcp, const std::string& message)
 {
 	all_scripts()->onCTCPReply(user, target, ctcp, message);
 }
 
-void ScriptMgr::onCTCP(const std::shared_ptr<User>& user, const std::string& target, const std::string& ctcp, const std::string& message)
+void ScriptMgr::onCTCP(const UserPtr& user, const std::string& target, const std::string& ctcp, const std::string& message)
 {
 	all_scripts()->onCTCP(user, target, ctcp, message);
 }
 
-void ScriptMgr::onChatAction(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+void ScriptMgr::onChatAction(const UserPtr& user, const std::string& target, const std::string& message)
 {
 	all_scripts()->onChatAction(user, target, message);
 }

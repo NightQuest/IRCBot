@@ -8,7 +8,7 @@ private:
 public:
 	handleLogin() : IRCScript("handleLogin"), sentUser(false) { }
 
-	void onNotice(const std::shared_ptr<User>& user, const std::string& target, const std::string& message)
+	void onNotice(const UserPtr& user, const std::string& target, const std::string& message)
 	{
 		if( target == "AUTH" )
 		{

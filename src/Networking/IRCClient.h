@@ -9,7 +9,7 @@ public:
 
 struct LineData
 {
-	std::shared_ptr<User> author;
+	UserPtr author;
 	std::string command;
 	std::deque<std::string> params;
 	std::string target;

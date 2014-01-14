@@ -14,7 +14,7 @@ public:
 		return vector<ChatCommand>(begin(commands), end(commands));
 	}
 
-	static void handleSQLCommand(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleSQLCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		if( !externalDB )
 			return;

@@ -15,13 +15,13 @@ public:
 		return vector<ChatCommand>(begin(commands), end(commands));
 	}
 
-	static void handleSayCommand(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleSayCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		sSock->sendMessage(messageTarget, arguments);
 	}
 
-	static void handleMeCommand(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleMeCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		sSock->sendAction(messageTarget, arguments);

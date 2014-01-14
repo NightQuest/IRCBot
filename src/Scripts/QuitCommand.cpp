@@ -15,7 +15,7 @@ public:
 		return vector<ChatCommand>(begin(commands), end(commands));
 	}
 
-	static void handleQuitCommand(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleQuitCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		if( !arguments.empty() )
 			sSock->sendQuit(arguments);
@@ -23,7 +23,7 @@ public:
 			sSock->sendQuit(config->getString("irc.quitmessage"));
 	}
 
-	static void handleExitCommand(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleExitCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		if( !arguments.empty() )
 			sSock->sendQuit(arguments);

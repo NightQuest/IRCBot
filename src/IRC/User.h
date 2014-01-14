@@ -27,3 +27,5 @@ public:
 
 	bool hasAccess(const unsigned int perm) { return (permissions & perm) == perm; }
 };
+
+typedef std::shared_ptr<User> UserPtr;

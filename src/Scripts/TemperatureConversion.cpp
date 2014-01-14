@@ -21,7 +21,7 @@ public:
 		return vector<ChatCommand>(begin(commands), end(commands));
 	}
 
-	static void handleFahrenheitToKelvin(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleFahrenheitToKelvin(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
@@ -30,7 +30,7 @@ public:
 		sSock->sendMessage(messageTarget, ss.str() + " K");
 	}
 
-	static void handleFahrenheitToCelcius(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleFahrenheitToCelcius(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
@@ -39,7 +39,7 @@ public:
 		sSock->sendMessage(messageTarget, ss.str() + " °C");
 	}
 
-	static void handleCelciusToKelvin(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleCelciusToKelvin(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
@@ -48,7 +48,7 @@ public:
 		sSock->sendMessage(messageTarget, ss.str() + " K");
 	}
 
-	static void handleCelciusToFahrenheit(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleCelciusToFahrenheit(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
@@ -57,7 +57,7 @@ public:
 		sSock->sendMessage(messageTarget, ss.str() + " °F");
 	}
 
-	static void handleKelvinToFahrenheit(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleKelvinToFahrenheit(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
@@ -66,7 +66,7 @@ public:
 		sSock->sendMessage(messageTarget, ss.str() + " °F");
 	}
 
-	static void handleKelvinToCelcius(const std::shared_ptr<User>& user, const std::string& target, const std::string& arguments)
+	static void handleKelvinToCelcius(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 		stringstream ss;
