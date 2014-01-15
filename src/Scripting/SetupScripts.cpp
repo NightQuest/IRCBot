@@ -8,6 +8,7 @@ void setupQuitCommand();
 void setupSayCommand();
 void setupSQLCommand();
 void setupTemperatureConversion();
+void setupBindCommand();
 
 void setupScripts()
 {
@@ -19,4 +20,5 @@ void setupScripts()
 	setupSayCommand();
 	setupSQLCommand();
 	setupTemperatureConversion();
+	setupBindCommand();
 }

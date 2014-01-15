@@ -6,6 +6,7 @@ enum botAccess
 	ACCESS_SQL			= 0x00000001,
 	ACCESS_QUIT			= 0x00000002,
 	ACCESS_SAY			= 0x00000004,
+	ACCESS_BIND			= 0x00000008,
 };
 
 class User
