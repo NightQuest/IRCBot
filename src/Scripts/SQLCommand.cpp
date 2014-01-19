@@ -8,20 +8,38 @@ public:
 	std::vector<ChatCommand> getCommands() override
 	{
 		ChatCommand commands[] = {
-			{ "sql", "Execute specified SQL and returns results", handleSQLCommand, ACCESS_SQL, vector<ChatCommand>() }
+			{ "sql", "Execute specified SQL and returns results", handleESQLCommand, ACCESS_SQL, vector<ChatCommand>() },
+			{ "isql", "Execute specified SQL and returns results", handleISQLCommand, ACCESS_INTERNAL_SQL, vector<ChatCommand>() }
+
 		};
 
 		return vector<ChatCommand>(begin(commands), end(commands));
 	}
 
-	static void handleSQLCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
+	static void handleESQLCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
 	{
 		if( !externalDB )
+			return;
+
+		handleSQL(externalDB.get(), user, target, arguments);
+	}
+
+	static void handleISQLCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
+	{
+		if( !internalDB )
+			return;
+
+		handleSQL(internalDB.get(), user, target, arguments);
+	}
+
+	static void handleSQL(MariaDB::Connection* const conn, const UserPtr& user, const std::string& target, const std::string& arguments)
+	{
+		if( !conn )
 			return;
 		
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 
-		MariaDB::QueryResult res = externalDB->query(arguments);
+		MariaDB::QueryResult res = conn->query(arguments);
 		if( res && res->getRowCount() != 0 )
 		{
 			MariaDB::QueryRow* row;
