@@ -70,13 +70,13 @@ void App::run()
 		try
 		{
 			sSock.reset(new IRCSocket(hostname, port, useSSL));
+
+			irc->process();
 		}
 		catch(SocketException& e)
 		{
 			cerr << e.what() << endl;
 		}
-
-		irc->process();
 
 	} while( config->getBool("irc.autoreconnect") );
 }
