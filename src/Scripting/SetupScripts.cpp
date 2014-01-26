@@ -9,6 +9,7 @@ void setupSayCommand();
 void setupSQLCommand();
 void setupTemperatureConversion();
 void setupBindCommand();
+void setupHelpCommand();
 
 void setupScripts()
 {
@@ -21,4 +22,5 @@ void setupScripts()
 	setupSQLCommand();
 	setupTemperatureConversion();
 	setupBindCommand();
+	setupHelpCommand();
 }
