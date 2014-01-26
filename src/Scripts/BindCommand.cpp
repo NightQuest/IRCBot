@@ -107,6 +107,67 @@ public:
 			}
 		}
 	}
+
+	void onChatText(const UserPtr& user, const std::string& target, const std::string& message)
+	{
+		if( !internalDB )
+			return;
+
+		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
+
+		if( config->getString("irc.commandchars").find(message[0]) != string::npos )
+		{
+			auto tmp = Util::explode(message, ' ');
+			string command = tmp[0].substr(1); // drop the commandchar
+			if( !internalDB->escape(command) )
+				return;
+
+			MariaDB::QueryResult res = internalDB->query("SELECT `esql`, `required_access` FROM `binds` WHERE `bind` = '" + command + "'");
+			if( !res || res->getRowCount() == 0 )
+				return;
+
+			MariaDB::QueryRow* row;
+			if( res->nextRow() && (row = res->getRow()) )
+			{
+				if( !user->hasAccess((*row)["required_access"].getUInt32()) )
+					return;
+
+				MariaDB::QueryResult res2 = externalDB->query((*row)["esql"].getString());
+				if( !res2 || res2->getRowCount() == 0 )
+					return;
+
+				MariaDB::QueryRow* row;
+				int rows = 0;
+				while( rows < 15 && res2->nextRow() && (row = res2->getRow()) )
+				{
+					rows++;
+					stringstream ss;
+					unsigned int rowCount = row->getFieldCount();
+					for( unsigned int x = 0; x < rowCount; x++ )
+					{
+						if( x > 0 && x < rowCount )
+							ss << ", ";
+
+						std::string str = (*row)[x].getString();
+						if( str.empty() )
+							ss << "NULL";
+						else
+						{
+							for( size_t x = 0; x < str.length(); x++ )
+								if( str[x] == '\r' )
+									ss << "\\r";
+								else if( str[x] == '\n' )
+									ss << "\\n";
+								else
+									ss << str[x];
+						}
+					}
+
+					sSock->sendMessage(messageTarget, ss.str());
+				}
+			}
+		}
+	}
 };
 
 void setupBindCommand()

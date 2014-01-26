@@ -200,59 +200,9 @@ void IRCClient::handleSCommand(const LineData& data)
 			{
 				auto tmp = Util::explode(data.data, ' ');
 				tmp[0] = tmp[0].substr(1); // drop the commandchar
-				if( !handleCCommand(sScriptMgr->getCommands(), tmp, data) )
-				{
-					string command = tmp[0];
-					if( internalDB->escape(command) )
-					{
-						MariaDB::QueryResult res = internalDB->query("SELECT `esql`, `required_access` FROM `binds` WHERE `bind` = '" + command + "'");
-						if( res && res->getRowCount() != 0 )
-						{
-							MariaDB::QueryRow* row;
-							if( res->nextRow() && (row = res->getRow()) )
-							{
-								if( data.author->hasAccess((*row)["required_access"].getUInt32()) )
-								{
-									MariaDB::QueryResult res2 = externalDB->query((*row)["esql"].getString());
-									if( res2 && res2->getRowCount() != 0 )
-									{
-										MariaDB::QueryRow* row;
-										int rows = 0;
-										while( rows < 15 && res2->nextRow() && (row = res2->getRow()) )
-										{
-											rows++;
-											stringstream ss;
-											unsigned int rowCount = row->getFieldCount();
-											for( unsigned int x = 0; x < rowCount; x++ )
-											{
-												if( x > 0 && x < rowCount )
-													ss << ", ";
-
-												std::string str = (*row)[x].getString();
-												if( str.empty() )
-													ss << "NULL";
-												else
-												{
-													for( size_t x = 0; x < str.length(); x++ )
-														if( str[x] == '\r' )
-															ss << "\\r";
-														else if( str[x] == '\n' )
-															ss << "\\n";
-														else
-															ss << str[x];
-												}
-											}
-
-											string messageTarget = (data.target == sSock->getNickname()) ? data.author->getNickname() : data.target;
-											sSock->sendMessage(messageTarget, ss.str());
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+				handleCCommand(sScriptMgr->getCommands(), tmp, data);
 			}
+
 			sScriptMgr->onChatText(data.author, data.target, data.data);
 		}
 	}
