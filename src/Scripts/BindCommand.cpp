@@ -110,7 +110,7 @@ public:
 
 	void onChatText(const UserPtr& user, const std::string& target, const std::string& message)
 	{
-		if( !internalDB )
+		if( !internalDB || !externalDB )
 			return;
 
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
@@ -132,7 +132,16 @@ public:
 				if( !user->hasAccess((*row)["required_access"].getUInt32()) )
 					return;
 
-				MariaDB::QueryResult res2 = externalDB->query((*row)["esql"].getString());
+				string esql = (*row)["esql"].getString();
+				stringstream ss;
+				unsigned int replaced = 0;
+				for( size_t x = 0; x < esql.length(); x++ )
+					if( esql[x] == '?' && replaced <= tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
+						ss << tmp[replaced];
+					else
+						ss << esql[x];
+
+				MariaDB::QueryResult res2 = externalDB->query(ss.str());
 				if( !res2 || res2->getRowCount() == 0 )
 					return;
 
@@ -141,7 +150,7 @@ public:
 				while( rows < 15 && res2->nextRow() && (row = res2->getRow()) )
 				{
 					rows++;
-					stringstream ss;
+					ss.str("");
 					unsigned int rowCount = row->getFieldCount();
 					for( unsigned int x = 0; x < rowCount; x++ )
 					{
