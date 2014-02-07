@@ -56,7 +56,6 @@ public:
 	void onWelcome(const std::string& message)
 	{
 		sentUser = true;
-		cout << message << endl;
 
 		if( sSock->getNickname() != config->getString("irc.nickname") )
 		{

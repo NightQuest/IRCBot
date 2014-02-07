@@ -13,6 +13,14 @@ public:
 		cout << "PING <-> PONG" << endl;
 	}
 
+	void onWelcome(const std::string& message)
+	{
+		if( !config->getBool("echo.welcome") )
+			return;
+
+		cout << message << endl;
+	}
+
 	void onQuit(const UserPtr& user, const std::string& message)
 	{
 		if( !config->getBool("echo.quit") )
