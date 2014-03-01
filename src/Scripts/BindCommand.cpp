@@ -136,7 +136,7 @@ public:
 				stringstream ss;
 				unsigned int replaced = 0;
 				for( size_t x = 0; x < esql.length(); x++ )
-					if( esql[x] == '?' && replaced <= tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
+					if( esql[x] == '?' && replaced < tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
 						ss << tmp[replaced];
 					else
 						ss << esql[x];
