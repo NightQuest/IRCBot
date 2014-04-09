@@ -409,6 +409,7 @@ EXPORTS
     BN_clear_bit                   @122 ; BN_clear_bit
     BN_clear_free                  @123 ; BN_clear_free
     BN_cmp                         @124 ; BN_cmp
+    BN_consttime_swap              @3907; BN_consttime_swap
     BN_copy                        @125 ; BN_copy
     BN_dec2bn                      @1001; BN_dec2bn
     BN_div                         @126 ; BN_div
