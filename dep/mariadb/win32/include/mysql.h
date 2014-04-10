@@ -1,5 +1,6 @@
 /* Copyright (C) 2000 MySQL AB & MySQL Finland AB & TCX DataKonsult AB
-   
+                 2012 by MontyProgram AB
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License as published by the Free Software Foundation; either
@@ -15,29 +16,26 @@
    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA 02111-1307, USA */
 
-/* defines for the libmysql library */
+/* defines for the libmariadb library */
 
 #ifndef _mysql_h
 #define _mysql_h
 
-#ifndef MYSQL_SERVER
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
+#ifndef LIBMARIADB
+#define LIBMARIADB
 #endif
 
-  
 #ifndef _global_h				/* If not standard header */
 #include <sys/types.h>
-#ifdef __LCC__
-#include <winsock2.h>				/* For windows */
-#endif
 typedef char my_bool;
 
 #if !defined(_WIN32)
 #define STDCALL
 #else
-#include <WinSock2.h>
 #define STDCALL __stdcall
 #endif
 typedef char * gptr;
@@ -46,8 +44,10 @@ typedef char * gptr;
 
 #ifndef my_socket_defined
 #define my_socket_defined
-#ifdef _WIN32
-#define my_socket SOCKET
+#if defined(_WIN64)
+#define my_socket unsigned long long
+#elif defined(_WIN32)
+#define my_socket unsigned int
 #else
 typedef int my_socket;
 #endif
@@ -56,25 +56,26 @@ typedef int my_socket;
 #include "mysql_com.h"
 #include "mysql_version.h"
 #include "my_list.h"
+#include "m_ctype.h"
 
 #ifndef ST_USED_MEM_DEFINED
 #define ST_USED_MEM_DEFINED
-typedef struct st_used_mem {   /* struct for once_alloc */
-  struct st_used_mem *next;    /* Next block in use */
-  size_t left;                 /* memory left in block  */
-  size_t size;                 /* Size of block */
-} USED_MEM;
+  typedef struct st_used_mem {   /* struct for once_alloc */
+    struct st_used_mem *next;    /* Next block in use */
+    size_t left;                 /* memory left in block  */
+    size_t size;                 /* Size of block */
+  } USED_MEM;
 
-typedef struct st_mem_root {
-  USED_MEM *free;
-  USED_MEM *used;
-  USED_MEM *pre_alloc;
-  size_t min_malloc;
-  size_t block_size;
-  unsigned int block_num;
-  unsigned int first_block_usage;
-  void (*error_handler)(void);
-} MEM_ROOT;
+  typedef struct st_mem_root {
+    USED_MEM *free;
+    USED_MEM *used;
+    USED_MEM *pre_alloc;
+    size_t min_malloc;
+    size_t block_size;
+    unsigned int block_num;
+    unsigned int first_block_usage;
+    void (*error_handler)(void);
+  } MEM_ROOT;
 #endif
 
 extern unsigned int mysql_port;
@@ -87,202 +88,214 @@ extern char *mysql_unix_port;
 #define IS_NUM_FIELD(f)	 ((f)->flags & NUM_FLAG)
 #define INTERNAL_NUM_FIELD(f) (((f)->type <= MYSQL_TYPE_INT24 && ((f)->type != MYSQL_TYPE_TIMESTAMP || (f)->length == 14 || (f)->length == 8)) || (f)->type == MYSQL_TYPE_YEAR)
 
-typedef struct st_mysql_field {
-  char *name;			/* Name of column */
-  char *org_name;		/* Name of original column (added after 3.23.58) */
-  char *table;			/* Table of column if column was a field */
-  char *org_table;		/* Name of original table (added after 3.23.58 */
-  char *db;                     /* table schema (added after 3.23.58) */
-  char *catalog;                /* table catalog (added after 3.23.58) */
-  char *def;			/* Default value (set by mysql_list_fields) */
-  unsigned long length;		/* Width of column */
-  unsigned long max_length;	/* Max width of selected set */
-/* added after 3.23.58 */
-  unsigned int name_length;
-  unsigned int org_name_length;
-  unsigned int table_length;
-  unsigned int org_table_length;
-  unsigned int db_length;
-  unsigned int catalog_length;
-  unsigned int def_length;
-/***********************/
-  unsigned int flags;		/* Div flags */
-  unsigned int decimals;	/* Number of decimals in field */
-  unsigned int charsetnr;       /* char set number (added in 4.1) */
-  enum enum_field_types type;	/* Type of field. Se mysql_com.h for types */
-  void *extension;              /* added in 4.1 */
-} MYSQL_FIELD;
+  typedef struct st_mysql_field {
+    char *name;			/* Name of column */
+    char *org_name;		/* Name of original column (added after 3.23.58) */
+    char *table;			/* Table of column if column was a field */
+    char *org_table;		/* Name of original table (added after 3.23.58 */
+    char *db;                     /* table schema (added after 3.23.58) */
+    char *catalog;                /* table catalog (added after 3.23.58) */
+    char *def;			/* Default value (set by mysql_list_fields) */
+    unsigned long length;		/* Width of column */
+    unsigned long max_length;	/* Max width of selected set */
+  /* added after 3.23.58 */
+    unsigned int name_length;
+    unsigned int org_name_length;
+    unsigned int table_length;
+    unsigned int org_table_length;
+    unsigned int db_length;
+    unsigned int catalog_length;
+    unsigned int def_length;
+  /***********************/
+    unsigned int flags;		/* Div flags */
+    unsigned int decimals;	/* Number of decimals in field */
+    unsigned int charsetnr;       /* char set number (added in 4.1) */
+    enum enum_field_types type;	/* Type of field. Se mysql_com.h for types */
+    void *extension;              /* added in 4.1 */
+  } MYSQL_FIELD;
 
-typedef char **MYSQL_ROW;		/* return data as array of strings */
-typedef unsigned int MYSQL_FIELD_OFFSET; /* offset to current field */
+  typedef char **MYSQL_ROW;		/* return data as array of strings */
+  typedef unsigned int MYSQL_FIELD_OFFSET; /* offset to current field */
 
 #if defined(NO_CLIENT_LONG_LONG)
-typedef unsigned long my_ulonglong;
+  typedef unsigned long my_ulonglong;
 #elif defined (_WIN32)
-typedef unsigned __int64 my_ulonglong;
+  typedef unsigned __int64 my_ulonglong;
 #else
-typedef unsigned long long my_ulonglong;
+  typedef unsigned long long my_ulonglong;
 #endif
 
+#ifndef longlong_defined
+#if defined(HAVE_LONG_LONG) && SIZEOF_LONG != 8
+typedef long long int longlong;
+#else
+typedef long		longlong;
+#endif
+#define longlong_defined
+#endif
+
+/* mysql compatibility macro */
+#define mysql_options4(A,B,C,D) mysql_optionsv((A),(B),(C),(D))
 
 #define SET_CLIENT_ERROR(a, b, c, d) \
-{ \
-  (a)->net.last_errno= (b);\
-  strncpy((a)->net.sqlstate, (c), sizeof((a)->net.sqlstate));\
-  strncpy((a)->net.last_error, (d) ? (d) : ER((b)), sizeof((a)->net.last_error));\
-}
+  { \
+    (a)->net.last_errno= (b);\
+    strncpy((a)->net.sqlstate, (c), sizeof((a)->net.sqlstate));\
+    strncpy((a)->net.last_error, (d) ? (d) : ER((b)), sizeof((a)->net.last_error));\
+  }
 
 #define CLEAR_CLIENT_ERROR(a) \
-{ \
-  (a)->net.last_errno= 0;\
-  strcpy((a)->net.sqlstate, "00000");\
-  (a)->net.last_error[0]= '\0';\
-}
+  { \
+    (a)->net.last_errno= 0;\
+    strcpy((a)->net.sqlstate, "00000");\
+    (a)->net.last_error[0]= '\0';\
+  }
 
 #define MYSQL_COUNT_ERROR (~(my_ulonglong) 0)
 
 
-typedef struct st_mysql_rows {
-  struct st_mysql_rows *next;		/* list of rows */
-  MYSQL_ROW data;
-  unsigned long length;
-} MYSQL_ROWS;
+  typedef struct st_mysql_rows {
+    struct st_mysql_rows *next;		/* list of rows */
+    MYSQL_ROW data;
+    unsigned long length;
+  } MYSQL_ROWS;
 
-typedef MYSQL_ROWS *MYSQL_ROW_OFFSET;	/* offset to current row */
+  typedef MYSQL_ROWS *MYSQL_ROW_OFFSET;	/* offset to current row */
 
-typedef struct st_mysql_data {
-  my_ulonglong rows;
-  unsigned int fields;
-  MYSQL_ROWS *data;
-  MEM_ROOT alloc;
-} MYSQL_DATA;
+  typedef struct st_mysql_data {
+    my_ulonglong rows;
+    unsigned int fields;
+    MYSQL_ROWS *data;
+    MEM_ROOT alloc;
+  } MYSQL_DATA;
 
-enum mysql_option 
-{
-  MYSQL_OPT_CONNECT_TIMEOUT, 
-  MYSQL_OPT_COMPRESS,
-  MYSQL_OPT_NAMED_PIPE,
-  MYSQL_INIT_COMMAND,
-  MYSQL_READ_DEFAULT_FILE,
-  MYSQL_READ_DEFAULT_GROUP,
-  MYSQL_SET_CHARSET_DIR,
-  MYSQL_SET_CHARSET_NAME,
-  MYSQL_OPT_LOCAL_INFILE,
-  MYSQL_OPT_PROTOCOL,
-  MYSQL_SHARED_MEMORY_BASE_NAME,
-  MYSQL_OPT_READ_TIMEOUT,
-  MYSQL_OPT_WRITE_TIMEOUT,
-  MYSQL_OPT_USE_RESULT,
-  MYSQL_OPT_USE_REMOTE_CONNECTION,
-  MYSQL_OPT_USE_EMBEDDED_CONNECTION,
-  MYSQL_OPT_GUESS_CONNECTION,
-  MYSQL_SET_CLIENT_IP,
-  MYSQL_SECURE_AUTH,
-  MYSQL_REPORT_DATA_TRUNCATION,
-  MYSQL_OPT_RECONNECT,
-  MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-  MYSQL_OPT_PLUGIN_DIR,
-  MYSQL_OPT_DEFAULT_AUTH,
-  MYSQL_OPT_PROGRESS_CALLBACK
-};
+  enum mysql_option 
+  {
+    MYSQL_OPT_CONNECT_TIMEOUT, 
+    MYSQL_OPT_COMPRESS,
+    MYSQL_OPT_NAMED_PIPE,
+    MYSQL_INIT_COMMAND,
+    MYSQL_READ_DEFAULT_FILE,
+    MYSQL_READ_DEFAULT_GROUP,
+    MYSQL_SET_CHARSET_DIR,
+    MYSQL_SET_CHARSET_NAME,
+    MYSQL_OPT_LOCAL_INFILE,
+    MYSQL_OPT_PROTOCOL,
+    MYSQL_SHARED_MEMORY_BASE_NAME,
+    MYSQL_OPT_READ_TIMEOUT,
+    MYSQL_OPT_WRITE_TIMEOUT,
+    MYSQL_OPT_USE_RESULT,
+    MYSQL_OPT_USE_REMOTE_CONNECTION,
+    MYSQL_OPT_USE_EMBEDDED_CONNECTION,
+    MYSQL_OPT_GUESS_CONNECTION,
+    MYSQL_SET_CLIENT_IP,
+    MYSQL_SECURE_AUTH,
+    MYSQL_REPORT_DATA_TRUNCATION,
+    MYSQL_OPT_RECONNECT,
+    MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+    MYSQL_PLUGIN_DIR,
+    MYSQL_DEFAULT_AUTH,
+    MYSQL_OPT_BIND,
+    MYSQL_OPT_SSL_KEY,
+    MYSQL_OPT_SSL_CERT,
+    MYSQL_OPT_SSL_CA,
+    MYSQL_OPT_SSL_CAPATH,
+    MYSQL_OPT_SSL_CIPHER,
+    MYSQL_OPT_SSL_CRL,
+    MYSQL_OPT_SSL_CRLPATH,
+    /* Connection attribute options */
+    MYSQL_OPT_CONNECT_ATTR_RESET,
+    MYSQL_OPT_CONNECT_ATTR_ADD,
+    MYSQL_OPT_CONNECT_ATTR_DELETE,
 
-enum mysql_status { MYSQL_STATUS_READY,
-                    MYSQL_STATUS_GET_RESULT,
-		    MYSQL_STATUS_USE_RESULT,
-                    MYSQL_STATUS_QUERY_SENT,
-                    MYSQL_STATUS_SENDING_LOAD_DATA,
-                    MYSQL_STATUS_FETCHING_DATA,
-                    MYSQL_STATUS_NEXT_RESULT_PENDING,
-                    MYSQL_STATUS_QUIT_SENT, /* object is "destroyed" at this stage */
-};
+    /* MariaDB specific */
+    MYSQL_PROGRESS_CALLBACK=5999,
+    MYSQL_DATABASE_DRIVER=7000
+  };
 
-enum mysql_protocol_type
-{
-  MYSQL_PROTOCOL_DEFAULT, MYSQL_PROTOCOL_TCP, MYSQL_PROTOCOL_SOCKET,
-  MYSQL_PROTOCOL_PIPE, MYSQL_PROTOCOL_MEMORY
-};
+  enum mysql_status { MYSQL_STATUS_READY,
+                      MYSQL_STATUS_GET_RESULT,
+          MYSQL_STATUS_USE_RESULT,
+                      MYSQL_STATUS_QUERY_SENT,
+                      MYSQL_STATUS_SENDING_LOAD_DATA,
+                      MYSQL_STATUS_FETCHING_DATA,
+                      MYSQL_STATUS_NEXT_RESULT_PENDING,
+                      MYSQL_STATUS_QUIT_SENT, /* object is "destroyed" at this stage */
+  };
+
+  enum mysql_protocol_type
+  {
+    MYSQL_PROTOCOL_DEFAULT, MYSQL_PROTOCOL_TCP, MYSQL_PROTOCOL_SOCKET,
+    MYSQL_PROTOCOL_PIPE, MYSQL_PROTOCOL_MEMORY
+  };
+
+struct st_mysql_options_extention;
 
 struct st_mysql_options {
-  unsigned int connect_timeout, read_timeout, write_timeout;
-  unsigned int port, protocol;
-  unsigned long client_flag;
-  char *host,*user,*password,*unix_socket,*db;
-  char *init_command;
-  char *my_cnf_file,*my_cnf_group, *charset_dir, *charset_name;
-  char *ssl_key;				/* PEM key file */
-  char *ssl_cert;				/* PEM cert file */
-  char *ssl_ca;					/* PEM CA file */
-  char *ssl_capath;				/* PEM directory of CA-s? */
-  char *ssl_cipher;
-  char *shared_memory_base_name;
-  unsigned long max_allowed_packet;
-  my_bool use_ssl;				/* if to use SSL or not */
-  my_bool compress,named_pipe;
-  my_bool unused_1, unused_2, unused_3, unused_4;
-  enum mysql_option methods_to_use;
-  char *client_ip;
-  my_bool secure_auth;
-  my_bool report_data_truncation; 
-  /* function pointers for local infile support */
-  int (*local_infile_init)(void **, const char *, void *);
-  int (*local_infile_read)(void *, char *, unsigned int);
-  void (*local_infile_end)(void *);
-  int (*local_infile_error)(void *, char *, unsigned int);
-  void *local_infile_userdata;
-  struct st_mysql_options_extention *extension;
+    unsigned int connect_timeout, read_timeout, write_timeout;
+    unsigned int port, protocol;
+    unsigned long client_flag;
+    char *host,*user,*password,*unix_socket,*db;
+    struct st_dynamic_array *init_command;
+    char *my_cnf_file,*my_cnf_group, *charset_dir, *charset_name;
+    char *ssl_key;				/* PEM key file */
+    char *ssl_cert;				/* PEM cert file */
+    char *ssl_ca;					/* PEM CA file */
+    char *ssl_capath;				/* PEM directory of CA-s? */
+    char *ssl_cipher;
+    char *shared_memory_base_name;
+    unsigned long max_allowed_packet;
+    my_bool use_ssl;				/* if to use SSL or not */
+    my_bool compress,named_pipe;
+    my_bool unused_1, unused_2, unused_3, unused_4;
+    enum mysql_option methods_to_use;
+    char *client_ip;
+    my_bool secure_auth;
+    my_bool report_data_truncation; 
+    /* function pointers for local infile support */
+    int (*local_infile_init)(void **, const char *, void *);
+    int (*local_infile_read)(void *, char *, unsigned int);
+    void (*local_infile_end)(void *);
+    int (*local_infile_error)(void *, char *, unsigned int);
+    void *local_infile_userdata;
+    struct st_mysql_options_extention *extension;
 };
 
-typedef struct st_mysql {
-  NET		net;			/* Communication parameters */
-  unsigned char *unused;
-  char		*host,*user,*passwd,*unix_socket,*server_version,*host_info;
-  char		*info,*db;
-  const struct charset_info_st *charset;      /* character set */
-  MYSQL_FIELD  *fields;
-  MEM_ROOT     field_alloc;
-  my_ulonglong affected_rows;
-  my_ulonglong insert_id;		/* id if insert on table with NEXTNR */
-  my_ulonglong extra_info;		/* Used by mysqlshow */
-  unsigned long thread_id;		/* Id for connection in server */
-  unsigned long packet_length;
-  unsigned int	port;
-  unsigned long client_flag,server_capabilities; /* changed from int to long in 4.1 protocol */
-  unsigned int	protocol_version;
-  unsigned int	field_count;
-  unsigned int 	server_status;
-  unsigned int  server_language;
-  unsigned int  warning_count;          /* warning count, added in 4.1 protocol */
-  struct st_mysql_options options;
-  enum mysql_status status;
-  my_bool	free_me;		/* If free in mysql_close */
-  my_bool	reconnect;		/* set to 1 if automatic reconnect */
-  char	        scramble_buff[20+ 1];
-  /* madded after 3.23.58 */
-  my_bool       unused_1;
-  void          *unused_2, *unused_3, *unused_4, *unused_5;
-  LIST          *stmts;
-  const struct  st_mysql_methods *methods;
-  void          *thd;
-  my_bool       *unbuffered_fetch_owner;
-  char          *info_buffer;
-  void          *extension;
+  typedef struct st_mysql {
+    NET		net;			/* Communication parameters */
+    void  *unused_0;
+    char *host,*user,*passwd,*unix_socket,*server_version,*host_info;
+    char *info,*db;
+    const struct charset_info_st *charset;      /* character set */
+    MYSQL_FIELD *fields;
+    MEM_ROOT field_alloc;
+    my_ulonglong affected_rows;
+    my_ulonglong insert_id;		/* id if insert on table with NEXTNR */
+    my_ulonglong extra_info;		/* Used by mysqlshow */
+    unsigned long thread_id;		/* Id for connection in server */
+    unsigned long packet_length;
+    unsigned int	port;
+    unsigned long client_flag,server_capabilities; /* changed from int to long in 4.1 protocol */
+    unsigned int	protocol_version;
+    unsigned int	field_count;
+    unsigned int 	server_status;
+    unsigned int  server_language;
+    unsigned int  warning_count;          /* warning count, added in 4.1 protocol */
+    struct st_mysql_options options;
+    enum mysql_status status;
+    my_bool	free_me;		/* If free in mysql_close */
+    my_bool	reconnect;		/* set to 1 if automatic reconnect */
+    char	        scramble_buff[20+ 1];
+    /* madded after 3.23.58 */
+    my_bool       unused_1;
+    void          *unused_2, *unused_3, *unused_4, *unused_5;
+    LIST          *stmts;
+    const struct  st_mysql_methods *methods;
+    void          *thd;
+    my_bool       *unbuffered_fetch_owner;
+    char          *info_buffer;
+    void          *extension;
 } MYSQL;
-
-typedef struct st_mysql_lex_string {
-  char *str;
-  size_t length;
-} MYSQL_LEX_STRING;
-
-struct st_mysql_options_extention {
-  char *plugin_dir;
-  char *default_auth;
-  void (*report_progress)(const MYSQL *mysql,
-                          unsigned int stage,
-                          unsigned int max_stage,
-                          double progress,
-                          const char *proc_info,
-                          unsigned int proc_info_length);
-};
 
 typedef struct st_mysql_res {
   my_ulonglong  row_count;
@@ -305,6 +318,7 @@ enum enum_mysql_timestamp_type
   MYSQL_TIMESTAMP_DATE= 0, MYSQL_TIMESTAMP_DATETIME= 1, MYSQL_TIMESTAMP_TIME= 2
 };
 
+
 typedef struct st_mysql_time
 {
   unsigned int  year, month, day, hour, minute, second;
@@ -312,6 +326,9 @@ typedef struct st_mysql_time
   my_bool       neg;
   enum enum_mysql_timestamp_type time_type;
 } MYSQL_TIME;
+
+#define AUTO_SEC_PART_DIGITS 31
+#define SEC_PART_DIGITS 6
 
 typedef struct character_set
 {
@@ -324,6 +341,16 @@ typedef struct character_set
   unsigned int      mbminlen;   /* min. length for multibyte strings */
   unsigned int      mbmaxlen;   /* max. length for multibyte strings */
 } MY_CHARSET_INFO;
+
+typedef struct 
+{
+  unsigned long *p_max_allowed_packet;
+  unsigned long *p_net_buffer_length;
+  void *extension;
+} MYSQL_PARAMETERS;
+
+#define net_buffer_length (*mysql_get_parameters()->p_net_buffer_length)
+#define max_allowed_packet (*mysql_get_parameters()->p_max_allowed_packet)
 
 /* Local infile support functions */
 #define LOCAL_INFILE_ERROR_LEN 512
@@ -370,7 +397,7 @@ int STDCALL mysql_set_character_set(MYSQL *mysql, const char *csname);
 MYSQL *		STDCALL mysql_init(MYSQL *mysql);
 int		STDCALL mysql_ssl_set(MYSQL *mysql, const char *key,
 				      const char *cert, const char *ca,
-				      const char *capath);
+				      const char *capath, const char *cipher);
 const char *	STDCALL mysql_get_ssl_cipher(MYSQL *mysql);
 int		STDCALL mysql_ssl_clear(MYSQL *mysql);
 MYSQL *		STDCALL mysql_connect(MYSQL *mysql, const char *host,
@@ -388,13 +415,13 @@ void		STDCALL mysql_close(MYSQL *sock);
 int		STDCALL mysql_select_db(MYSQL *mysql, const char *db);
 int		STDCALL mysql_query(MYSQL *mysql, const char *q);
 int		STDCALL mysql_send_query(MYSQL *mysql, const char *q,
-					 unsigned int length);
-int		STDCALL mysql_read_query_result(MYSQL *mysql);
+					 unsigned long length);
+my_bool	STDCALL mysql_read_query_result(MYSQL *mysql);
 int		STDCALL mysql_real_query(MYSQL *mysql, const char *q,
-					unsigned int length);
+					unsigned long length);
 int		STDCALL mysql_create_db(MYSQL *mysql, const char *DB);
 int		STDCALL mysql_drop_db(MYSQL *mysql, const char *DB);
-int		STDCALL mysql_shutdown(MYSQL *mysql);
+int		STDCALL mysql_shutdown(MYSQL *mysql, enum mysql_enum_shutdown_level shutdown_level);
 int		STDCALL mysql_dump_debug_info(MYSQL *mysql);
 int		STDCALL mysql_refresh(MYSQL *mysql,
 				     unsigned int refresh_options);
@@ -413,7 +440,7 @@ MYSQL_RES *	STDCALL mysql_list_processes(MYSQL *mysql);
 MYSQL_RES *	STDCALL mysql_store_result(MYSQL *mysql);
 MYSQL_RES *	STDCALL mysql_use_result(MYSQL *mysql);
 int		STDCALL mysql_options(MYSQL *mysql,enum mysql_option option,
-				      const char *arg);
+				      const void *arg);
 void		STDCALL mysql_free_result(MYSQL_RES *result);
 void		STDCALL mysql_data_seek(MYSQL_RES *result,
 					my_ulonglong offset);
@@ -430,7 +457,7 @@ unsigned long STDCALL mysql_real_escape_string(MYSQL *mysql,
 					       unsigned long length);
 void		STDCALL mysql_debug(const char *debug);
 #define mysql_debug_init(A) mysql_debug((A));
-void            STDCALL mysql_debug_end();
+void    STDCALL mysql_debug_end(void);
 void 		STDCALL myodbc_remove_escape(MYSQL *mysql,char *name);
 unsigned int	STDCALL mysql_thread_safe(void);
 unsigned int STDCALL mysql_warning_count(MYSQL *mysql);
@@ -443,10 +470,44 @@ int STDCALL mysql_set_server_option(MYSQL *mysql,
                                     enum enum_mysql_set_option option);
 const char * STDCALL mysql_get_client_info(void);
 unsigned long STDCALL mysql_get_client_version(void);
+my_bool STDCALL mariadb_connection(MYSQL *mysql);
+const char * STDCALL mysql_get_server_name(MYSQL *mysql);
+CHARSET_INFO * STDCALL mysql_get_charset_by_name(const char *csname);
+CHARSET_INFO * STDCALL mysql_get_charset_by_nr(unsigned int csnr);
+size_t STDCALL mariadb_convert_string(const char *from, size_t *from_len, CHARSET_INFO *from_cs,
+                                      char *to, size_t *to_len, CHARSET_INFO *to_cs, int *errorcode);
+int STDCALL mysql_optionsv(MYSQL *mysql,enum mysql_option option, ...); 
+MYSQL_PARAMETERS *STDCALL mysql_get_parameters(void);
 
 #include <my_stmt.h>
   
+/* these methods can be overwritten by db plugins */
+struct st_mysql_methods {
+  MYSQL *(*db_connect)(MYSQL *mysql, const char *host, const char *user, const char *passwd,
+					   const char *db, unsigned int port, const char *unix_socket, unsigned long clientflag);
+  void (*db_close)(MYSQL *mysql);
+  int (*db_command)(MYSQL *mysql,enum enum_server_command command, const char *arg,
+                    size_t length, my_bool skipp_check, void *opt_arg);
+  void (*db_skip_result)(MYSQL *mysql);
+  int (*db_read_query_result)(MYSQL *mysql);
+  MYSQL_DATA *(*db_read_rows)(MYSQL *mysql,MYSQL_FIELD *fields, unsigned int field_count);
+  int (*db_read_one_row)(MYSQL *mysql,unsigned int fields,MYSQL_ROW row, unsigned long *lengths);
+  /* prepared statements */
+  my_bool (*db_supported_buffer_type)(enum enum_field_types type);
+  my_bool (*db_read_prepare_response)(MYSQL_STMT *stmt);
+  int (*db_read_stmt_result)(MYSQL *mysql);
+  my_bool (*db_stmt_get_result_metadata)(MYSQL_STMT *stmt);
+  my_bool (*db_stmt_get_param_metadata)(MYSQL_STMT *stmt);
+  int (*db_stmt_read_all_rows)(MYSQL_STMT *stmt);
+  int (*db_stmt_fetch)(MYSQL_STMT *stmt, unsigned char **row);
+  int (*db_stmt_fetch_to_bind)(MYSQL_STMT *stmt, unsigned char *row);
+  void (*db_stmt_flush_unbuffered)(MYSQL_STMT *stmt);
+};
+
+/* synonyms/aliases functions */
 #define mysql_reload(mysql) mysql_refresh((mysql),REFRESH_GRANT)
+#define mysql_library_init mysql_server_init
+#define mysql_library_end mysql_server_end
 
 /* new api functions */
 

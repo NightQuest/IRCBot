@@ -402,11 +402,7 @@ typedef SOCKET_SIZE_TYPE size_socket;
 #define IO_SIZE			4096
 /* How much overhead does malloc have. The code often allocates
    something like 1024-MALLOC_OVERHEAD bytes */
-#ifdef SAFEMALLOC
-#define MALLOC_OVERHEAD (8+24+4)
-#else
 #define MALLOC_OVERHEAD 8
-#endif
 	/* get memory in huncs */
 #define ONCE_ALLOC_INIT		(uint) (4096-MALLOC_OVERHEAD)
 	/* Typical record cash */
@@ -726,8 +722,8 @@ typedef union {
   double v;
   long m[2];
 } doubleget_union;
-#define doubleget(V,M)	{ ((doubleget_union *)&V)->m[0] = *((long*) M); \
-			  ((doubleget_union *)&V)->m[1] = *(((long*) M)+1); }
+#define doubleget(V,M)	{ ((const doubleget_union *)&V)->m[0] = *((long*) M); \
+			  ((const doubleget_union *)&V)->m[1] = *(((long*) M)+1); }
 #define doublestore(T,V) { *((long *) T) = ((doubleget_union *)&V)->m[0]; \
 			   *(((long *) T)+1) = ((doubleget_union *)&V)->m[1]; }
 #define float4get(V,M) { *((long *) &(V)) = *((long*) (M)); }

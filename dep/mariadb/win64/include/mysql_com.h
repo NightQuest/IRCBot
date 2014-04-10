@@ -48,6 +48,12 @@
 #define MYSQL_SERVICENAME "MySql"
 #endif /* _WIN32 */
 
+enum mysql_enum_shutdown_level
+{
+  SHUTDOWN_DEFAULT = 0,
+  KILL_QUERY= 254,
+  KILL_CONNECTION= 255
+};
 
 enum enum_server_command
 {
@@ -143,11 +149,12 @@ enum enum_server_command
 #define CLIENT_MULTI_RESULTS     (1UL << 17)
 #define CLIENT_PS_MULTI_RESULTS  (1UL << 18)
 #define CLIENT_PLUGIN_AUTH       (1UL << 19)
+#define CLIENT_CONNECT_ATTRS     (1UL << 20)
 #define CLIENT_PROGRESS          (1UL << 29) /* client supports progress indicator */
 #define CLIENT_SSL_VERIFY_SERVER_CERT (1UL << 30)
+#define CLIENT_REMEMBER_OPTIONS  (1UL << 31)
 
 #define CLIENT_SUPPORTED_FLAGS  (CLIENT_LONG_PASSWORD | \
-                                 CLIENT_LONG_PASSWORD |\
                                  CLIENT_FOUND_ROWS |\
                                  CLIENT_LONG_FLAG |\
                                  CLIENT_CONNECT_WITH_DB |\
@@ -166,7 +173,9 @@ enum enum_server_command
                                  CLIENT_MULTI_STATEMENTS |\
                                  CLIENT_MULTI_RESULTS |\
                                  CLIENT_PROGRESS |\
-		                 CLIENT_SSL_VERIFY_SERVER_CERT)
+		                             CLIENT_SSL_VERIFY_SERVER_CERT |\
+                                 CLIENT_REMEMBER_OPTIONS |\
+                                 CLIENT_CONNECT_ATTRS)
 
 #define CLIENT_CAPABILITIES	(CLIENT_LONG_PASSWORD |\
                                  CLIENT_LONG_FLAG |\
@@ -175,7 +184,8 @@ enum enum_server_command
                                  CLIENT_MULTI_RESULTS | \
                                  CLIENT_PS_MULTI_RESULTS |\
                                  CLIENT_PROTOCOL_41 |\
-                                 CLIENT_PLUGIN_AUTH)
+                                 CLIENT_PLUGIN_AUTH |\
+                                 CLIENT_CONNECT_ATTRS)
 
 #define CLIENT_DEFAULT_FLAGS ((CLIENT_SUPPORTED_FLAGS & ~CLIENT_COMPRESS)\
                                                       & ~CLIENT_SSL)
@@ -189,7 +199,9 @@ enum enum_server_command
 #define SERVER_STATUS_LAST_ROW_SENT        128
 #define SERVER_STATUS_DB_DROPPED           256 
 #define SERVER_STATUS_NO_BACKSLASH_ESCAPES 512
-
+#define SERVER_STATUS_METADATA_CHANGED    1024
+#define SERVER_QUERY_WAS_SLOW             2048
+#define SERVER_PS_OUT_PARAMS              4096
 
 #define MYSQL_ERRMSG_SIZE	512
 #define NET_READ_TIMEOUT	30		/* Timeout on read */
@@ -209,13 +221,22 @@ typedef struct st_vio Vio;
 #define MAX_CHAR_WIDTH		255	/* Max length for a CHAR colum */
 #define MAX_BLOB_WIDTH		8192	/* Default width for blob */
 
+/* the following defines were added for PHP's mysqli and pdo extensions: 
+   see: CONC-56
+*/
+#define MAX_TINYINT_WIDTH     3
+#define MAX_SMALLINT_WIDTH    5
+#define MAX_MEDIUMINT_WIDTH   8
+#define MAX_INT_WIDTH        10
+#define MAX_BIGINT_WIDTH     20
+
+
 typedef struct st_net {
   Vio *vio;
   unsigned char *buff;
   unsigned char *buff_end,*write_pos,*read_pos;
   my_socket fd;					/* For Perl DBI/dbd */
   unsigned long remain_in_buf,length;
-  unsigned long cmd_buffer_length;
   unsigned long buf_length, where_b;
   unsigned long max_packet, max_packet_size;
   unsigned int pkt_nr, compress_pkt_nr;
@@ -309,7 +330,7 @@ int	net_flush(NET *net);
 int	my_net_write(NET *net,const char *packet, size_t len);
 int	net_write_command(NET *net,unsigned char command,const char *packet,
 			  size_t len);
-int	net_real_write(NET *net,const char *packet,unsigned long len);
+int	net_real_write(NET *net,const char *packet, size_t len);
 unsigned long	my_net_read(NET *net);
 
 struct rand_struct {
@@ -368,7 +389,6 @@ void hash_password(unsigned long *result, const char *password, size_t len);
 
 /* Some other useful functions */
 
-void my_init(void);
 void load_defaults(const char *conf_file, const char **groups,
 		   int *argc, char ***argv);
 my_bool my_thread_init(void);

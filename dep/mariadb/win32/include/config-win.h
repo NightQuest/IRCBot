@@ -111,7 +111,7 @@ typedef uint rf_SetTimer;
 #define bool_defined
 #define byte_defined
 #define HUGE_PTR
-#define STDCALL __stdcall           /* Used by libmysql.dll */
+#define STDCALL __stdcall           /* Used by libmariadb.dll */
 
 #define VOID_SIGHANDLER
 #define SIZEOF_CHAR		1
@@ -213,9 +213,9 @@ inline double ulonglong2double(ulonglong value)
 #define HAVE_STRPBRK
 #define HAVE_STRSTR
 
-#ifdef NOT_USED
+#ifdef WIN32
 #define HAVE_SNPRINTF		/* Gave link error */
-#define _snprintf snprintf
+#define snprintf _snprintf
 #endif
 
 #ifdef _MSC_VER
@@ -263,5 +263,10 @@ inline double ulonglong2double(ulonglong value)
 #endif
 #define statistic_increment(V,L) thread_safe_increment((V),(L))
 #define strcasecmp(A,B) _stricmp((A),(B))
+
+#define close(A) _close((A))
+#define fdopen(A,B) _fdopen((A),(B))
+#define sopen(A,B,C,D) _sopen((A),(B),(C),(D))
+
 
 #endif

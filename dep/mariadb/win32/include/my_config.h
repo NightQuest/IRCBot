@@ -1,6 +1,4 @@
 
-#define HAVE_GETHOSTBYNAME_R_GLIBC2_STYLE 1
-
 /*
  * Include file constants (processed in LibmysqlIncludeFiles.txt 1
  */
@@ -137,6 +135,7 @@
 /* #undef HAVE_SIGWAIT */
 /* #undef HAVE_SLEEP */
 /* #undef HAVE_SNPRINTF */
+/* #undef HAVE_SQLITE */
 /* #undef HAVE_STPCPY */
 #define HAVE_STRERROR 1
 /* #undef HAVE_STRLCPY */
@@ -274,4 +273,6 @@
  */
 #define HAVE_THREADS 1
 #define SHAREDIR "share"
-#define DEFAULT_CHARSET_HOME "C:/Program Files/mariadb-client"
+#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-client"
+#define PLUGINDIR "C:/Program Files (x86)/mariadb-client/lib/plugin"
+

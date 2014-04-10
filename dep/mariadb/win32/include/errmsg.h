@@ -17,6 +17,8 @@
 
 /* Error messages for mysql clients */
 /* error messages for the demon is in share/language/errmsg.sys */
+#ifndef _errmsg_h_
+#define _errmsg_h_
 
 #ifdef	__cplusplus
 extern "C" {
@@ -71,5 +73,8 @@ extern const char *client_errors[];	/* Error messages */
 #define CR_NEW_STMT_METADATA    2057
 #define CR_AUTH_PLUGIN_CANNOT_LOAD 2058
 #define CR_ALREADY_CONNECTED    2059
+#define CR_PLUGIN_FUNCTION_NOT_SUPPORTED 2060
 
 #define SQLSTATE_UNKNOWN "HY000"
+
+#endif

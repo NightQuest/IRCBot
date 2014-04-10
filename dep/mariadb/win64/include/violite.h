@@ -51,6 +51,10 @@ typedef struct st_vio Vio;
 #define HANDLE void *
 #endif
 
+/* vio read-ahead cachine */
+#define VIO_CACHE_SIZE 16384
+#define VIO_CACHE_MIN_SIZE 2048
+
 enum enum_vio_type { VIO_CLOSED, VIO_TYPE_TCPIP, VIO_TYPE_SOCKET,
 		     VIO_TYPE_NAMEDPIPE, VIO_TYPE_SSL};
 
@@ -69,11 +73,9 @@ void vio_reset(Vio* vio, enum enum_vio_type type,
  * vio_read and vio_write should have the same semantics
  * as read(2) and write(2).
  */
-int		vio_read(		Vio*		vio,
-					gptr		buf,	int	size);
-int		vio_write(		Vio*		vio,
-					const gptr	buf,
-					int		size);
+size_t vio_read(Vio* vio, gptr buf,	size_t size);
+my_bool vio_read_peek(Vio *vio, size_t *bytes);
+size_t vio_write(Vio* vio, const gptr buf, size_t size);
 /*
  * Whenever the socket is set to blocking mode or not.
  */
@@ -141,6 +143,9 @@ struct st_vio
 #ifdef HAVE_OPENSSL
   SSL *ssl;
 #endif
+  uchar *cache;       /* read-ahead cache to reduce reads (see CONC-79) */
+  uchar *cache_pos;   /* position of read-ahead cached data */
+  size_t cache_size;  /* <= VIO_CACHE_SIZE */
 };
 
 #ifdef	__cplusplus

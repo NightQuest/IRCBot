@@ -115,7 +115,7 @@
     </Link>
     <PostBuildEvent>
       <Message>Copy dep DDLs to bin</Message>
-      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)_$(Configuration)" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,7 +134,7 @@
       <AdditionalDependencies>libmariadb.lib;libeay32MDd.lib;ssleay32MDd.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)_$(Configuration)" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy dep DDLs to bin</Message>
@@ -161,7 +161,7 @@
     </Link>
     <PostBuildEvent>
       <Message>Copy dep DDLs to bin</Message>
-      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)_$(Configuration)" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -184,7 +184,7 @@
       <AdditionalDependencies>libmariadb.lib;libeay32MD.lib;ssleay32MD.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>CopyDLLs.bat "$(PlatformShortName)" "$(OutDir)"</Command>
+      <Command>CopyDLLs.bat "$(PlatformShortName)_$(Configuration)" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy dep DDLs to bin</Message>

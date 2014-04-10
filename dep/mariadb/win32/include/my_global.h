@@ -297,7 +297,9 @@ typedef unsigned short ushort;
 
 #if defined(__GNUC__)
 #define function_volatile	volatile
+#ifndef my_reinterpret_cast
 #define my_reinterpret_cast(A) reinterpret_cast<A>
+#endif
 #define my_const_cast(A) const_cast<A>
 #elif !defined(my_reinterpret_cast)
 #define my_reinterpret_cast(A) (A)
@@ -326,13 +328,6 @@ typedef unsigned short ushort;
 #define DBUG_OFF
 #endif
 
-#include <dbug.h>
-#ifndef DBUG_OFF
-#define dbug_assert(A) assert(A)
-#else
-#define dbug_assert(A)
-#endif
-
 #define MIN_ARRAY_SIZE	0	/* Zero or One. Gcc allows zero*/
 #define ASCII_BITS_USED 8	/* Bit char used */
 #define NEAR_F			/* No near function handling */
@@ -347,7 +342,7 @@ typedef int	my_socket;	/* File descriptor for sockets */
 #endif
 /* Type for fuctions that handles signals */
 #define sig_handler RETSIGTYPE
-typedef void	(*sig_return)();/* Returns type from signal */
+typedef void	(*sig_return)(void);/* Returns type from signal */
 #if defined(__GNUC__) && !defined(_lint)
 typedef char	pchar;		/* Mixed prototypes can take char */
 typedef char	puchar;		/* Mixed prototypes can take char */
@@ -446,11 +441,7 @@ typedef int	(*qsort_cmp)(const void *,const void *);
   How much overhead does malloc have. The code often allocates
   something like 1024-MALLOC_OVERHEAD bytes
 */
-#ifdef SAFEMALLOC
-#define MALLOC_OVERHEAD (8+24+4)
-#else
 #define MALLOC_OVERHEAD 8
-#endif
 	/* get memory in huncs */
 #define ONCE_ALLOC_INIT		(uint) (4096-MALLOC_OVERHEAD)
 	/* Typical record cash */
@@ -510,6 +501,14 @@ extern double		my_atof(const char*);
 /* #define sigset(A,B) signal((A),(B)) */
 #endif
 
+#if defined(_lint) || defined(FORCE_INIT_OF_VARS) || \
+    defined(__cplusplus) || !defined(__GNUC__)
+#define UNINIT_VAR(x) x= 0
+#else
+/* GCC specific self-initialization which inhibits the warning. */
+#define UNINIT_VAR(x) x= x
+#endif
+
 /* Remove some things that mit_thread break or doesn't support */
 #if defined(HAVE_mit_thread) && defined(THREAD)
 #undef HAVE_PREAD
@@ -532,25 +531,20 @@ extern double		my_atof(const char*);
 #define LONGLONG_MAX	((long long) 0x7FFFFFFFFFFFFFFFLL)
 #endif
 
-#if SIZEOF_LONG == 4
-#define INT_MIN32	(long) 0x80000000L
-#define INT_MAX32	(long) 0x7FFFFFFFL
+#define INT_MIN64       (~0x7FFFFFFFFFFFFFFFLL)
+#define INT_MAX64       0x7FFFFFFFFFFFFFFFLL
+#define INT_MIN32       (~0x7FFFFFFFL)
+#define INT_MAX32       0x7FFFFFFFL
 #define UINT_MAX32      0xFFFFFFFFL
-#define INT_MIN24	((long) 0xff800000L)
-#define INT_MAX24	0x007fffffL
-#define INT_MIN16	((short int) 0x8000)
-#define INT_MAX16	0x7FFF
-#define UINT_MAX16 0xFFFF
-#define INT_MIN8	((char) 0x80)
-#define INT_MAX8	((char) 0x7F)
-#else  /* Probably Alpha */
-#define INT_MIN32	((long) (int) 0x80000000)
-#define INT_MAX32	((long) (int) 0x7FFFFFFF)
-#define INT_MIN24	((long) (int) 0xff800000)
-#define INT_MAX24	((long) (int) 0x007fffff)
-#define INT_MIN16	((short int) 0xffff8000)
-#define INT_MAX16	((short int) 0x00007FFF)
-#endif
+#define INT_MIN24       (~0x007FFFFF)
+#define INT_MAX24       0x007FFFFF
+#define UINT_MAX24      0x00FFFFFF
+#define INT_MIN16       (~0x7FFF)
+#define INT_MAX16       0x7FFF
+#define UINT_MAX16      0xFFFF
+#define INT_MIN8        (~0x7F)
+#define INT_MAX8        0x7F
+#define UINT_MAX8       0xFF
 
 #ifndef ULL
 #ifdef HAVE_LONG_LONG
@@ -559,6 +553,15 @@ extern double		my_atof(const char*);
 #define ULL(A) A ## UL
 #endif
 #endif
+
+#if defined(HAVE_LONG_LONG) && !defined(ULONGLONG_MAX)
+/* First check for ANSI C99 definition: */
+#ifdef ULLONG_MAX
+#define ULONGLONG_MAX  ULLONG_MAX
+#else
+#define ULONGLONG_MAX ((unsigned long long)(~0ULL))
+#endif
+#endif /* defined (HAVE_LONG_LONG) && !defined(ULONGLONG_MAX)*/
 
 /* From limits.h instead */
 #ifndef DBL_MIN
@@ -581,8 +584,8 @@ typedef long		my_ptrdiff_t;
 #define ALIGN_PTR(A, t) ((t*) MY_ALIGN((A),sizeof(t)))
 			 /* Offset of filed f in structure t */
 #define OFFSET(t, f)	((size_t)(char *)&((t *)0)->f)
-#define ADD_TO_PTR(ptr,size,type) (type) ((byte*) (ptr)+size)
-#define PTR_BYTE_DIFF(A,B) (my_ptrdiff_t) ((byte*) (A) - (byte*) (B))
+#define ADD_TO_PTR(ptr,size,type) (type) ((unsigned char*) (ptr)+size)
+#define PTR_BYTE_DIFF(A,B) (my_ptrdiff_t) ((unsigned char*) (A) - (unsigned char*) (B))
 
 #define NullS		(char *) 0
 /* Nowdays we do not support MessyDos */
@@ -641,6 +644,7 @@ typedef long long int longlong;
 typedef unsigned long	ulonglong;	/* ulong or unsigned long long */
 typedef long		longlong;
 #endif
+#define longlong_defined
 #endif
 
 #ifndef MIN
@@ -649,7 +653,7 @@ typedef long		longlong;
 #ifndef MAX
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
-
+#define CMP_NUM(a,b)    (((a) < (b)) ? -1 : ((a) == (b)) ? 0 : 1)
 #ifdef USE_RAID
 /*
   The following is done with a if to not get problems with pre-processors
@@ -698,9 +702,6 @@ typedef short		int15;	/* Most effective integer 0 <= x <= 32767 */
 typedef char		*my_string; /* String of characters */
 typedef unsigned long	size_s; /* Size of strings (In string-funcs) */
 typedef int		myf;	/* Type of MyFlags in my_funcs */
-#ifndef byte_defined
-typedef char		byte;	/* Smallest addressable unit */
-#endif
 typedef char		my_bool; /* Small bool */
 #if !defined(bool) && !defined(bool_defined) && (!defined(HAVE_BOOL) || !defined(__cplusplus))
 typedef char		bool;	/* Ordinary boolean values 0 1 */
@@ -742,7 +743,7 @@ typedef char		bool;	/* Ordinary boolean values 0 1 */
 
 #define NOT_FIXED_DEC 31
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSVC)
 #define MYSQLND_LLU_SPEC "%I64u"
 #define MYSQLND_LL_SPEC "%I64d"
 #ifndef L64
@@ -1062,6 +1063,13 @@ do { doubleget_union _tmp; \
 #define SO_EXT ".dylib"
 #else
 #define SO_EXT ".so"
+#endif
+
+#include <dbug.h>
+#ifndef DBUG_OFF
+#define dbug_assert(A) assert(A)
+#else
+#define dbug_assert(A)
 #endif
 
 #ifdef HAVE_DLOPEN

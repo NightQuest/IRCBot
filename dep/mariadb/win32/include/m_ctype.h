@@ -32,28 +32,43 @@ extern "C" {
 #define CHARSET_DIR	"charsets/"
 #define MY_CS_NAME_SIZE 32
 
+#define MADB_DEFAULT_CHARSET_NAME "latin1"
+#define MADB_DEFAULT_COLLATION_NAME "latin1_swedish_ci"
 
 /* we use the mysqlnd implementation */
 typedef struct charset_info_st
 {
-  uint	nr; /* so far only 1 byte for charset */
-  uint  state;
+  unsigned int	nr; /* so far only 1 byte for charset */
+  unsigned int  state;
   char	*csname;
   char	*name;
-  char  *comment;
   char  *dir;
-  uint	char_minlen;
-  uint	char_maxlen;
-  uint 	(*mb_charlen)(uint c);
-  uint 	(*mb_valid)(const char *start, const char *end);
+  unsigned int codepage;
+  char  *encoding;
+  unsigned int	char_minlen;
+  unsigned int	char_maxlen;
+  unsigned int 	(*mb_charlen)(unsigned int c);
+  unsigned int 	(*mb_valid)(const char *start, const char *end);
 } CHARSET_INFO;
 
 extern const CHARSET_INFO  compiled_charsets[];
 extern CHARSET_INFO *default_charset_info;
+extern CHARSET_INFO *my_charset_bin;
+extern CHARSET_INFO *my_charset_latin1;
+extern CHARSET_INFO *my_charset_utf8_general_ci;
 
-CHARSET_INFO *find_compiled_charset(uint cs_number);
+CHARSET_INFO *find_compiled_charset(unsigned int cs_number);
 CHARSET_INFO *find_compiled_charset_by_name(const char *name);
 
 size_t mysql_cset_escape_quotes(const CHARSET_INFO *cset, char *newstr,  const char *escapestr, size_t escapestr_len);
 size_t mysql_cset_escape_slashes(const CHARSET_INFO *cset, char *newstr, const char *escapestr, size_t escapestr_len);
+char* madb_get_os_character_set(void);
+#ifdef _WIN32
+int madb_get_windows_cp(const char *charset);
+#endif
+
+#ifdef	__cplusplus
+}
+#endif
+
 #endif

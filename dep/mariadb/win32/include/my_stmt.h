@@ -25,6 +25,9 @@
 #define MYSQL_DATA_TRUNCATED 101
 #define MYSQL_DEFAULT_PREFETCH_ROWS (unsigned long) 1
 
+/* Bind flags */
+#define MADB_BIND_DUMMY 1
+
 
 #define SET_CLIENT_STMT_ERROR(a, b, c, d) \
 { \
@@ -77,8 +80,6 @@ typedef enum mysql_stmt_state
   MYSQL_STMT_FETCH_DONE
 } enum_mysqlnd_stmt_state;
 
-
-
 typedef struct st_mysql_bind
 {
   unsigned long  *length;          /* output length pointer */
@@ -96,7 +97,7 @@ typedef struct st_mysql_bind
   unsigned long  buffer_length;
   unsigned long  offset;           /* offset position for char/binary fetch */
   unsigned long  length_value;     /* Used if length is 0 */
-  unsigned int   param_number;     /* For null count and error messages */
+  unsigned int   flags;            /* special flags, e.g. for dummy bind  */
   unsigned int   pack_length;      /* Internal length for packed data */
   enum enum_field_types buffer_type;  /* buffer type */
   my_bool        error_value;      /* used if error is 0 */
@@ -198,7 +199,7 @@ struct st_mysql_stmt
 
   my_bool                  cursor_exists;
 
-  MYSQL_CMD_BUFFER         cmd_buffer;
+  void                     *extension;
   mysql_stmt_fetch_row_func fetch_row_func;
   unsigned int             execute_count;/* count how many times the stmt was executed */
   mysql_stmt_use_or_store_func default_rset_handler;
@@ -206,18 +207,19 @@ struct st_mysql_stmt
 };
 
 typedef void (*ps_field_fetch_func)(MYSQL_BIND *r_param, const MYSQL_FIELD * field, unsigned char **row);
-struct st_mysql_perm_bind {
+typedef struct st_mysql_perm_bind {
   ps_field_fetch_func func;
   /* should be signed int */
   int pack_len;
   unsigned long max_len;
-};
+} MYSQL_PS_CONVERSION;
 
-extern struct st_mysql_perm_bind mysql_ps_fetch_functions[MYSQL_TYPE_GEOMETRY + 1];
+extern MYSQL_PS_CONVERSION mysql_ps_fetch_functions[MYSQL_TYPE_GEOMETRY + 1];
 unsigned long net_safe_read(MYSQL *mysql);
 void mysql_init_ps_subsystem(void);
 unsigned long net_field_length(unsigned char **packet);
-int simple_command(MYSQL *mysql,enum enum_server_command command, const char *arg, size_t length, my_bool skipp_check);
+int simple_command(MYSQL *mysql,enum enum_server_command command, const char *arg,
+          	       size_t length, my_bool skipp_check, void *opt_arg);
 /*
  *  function prototypes
  */
@@ -248,10 +250,5 @@ my_ulonglong STDCALL mysql_stmt_num_rows(MYSQL_STMT *stmt);
 my_ulonglong STDCALL mysql_stmt_affected_rows(MYSQL_STMT *stmt);
 my_ulonglong STDCALL mysql_stmt_insert_id(MYSQL_STMT *stmt);
 unsigned int STDCALL mysql_stmt_field_count(MYSQL_STMT *stmt);
-my_bool STDCALL mysql_stmt_reset(MYSQL_STMT *stmt);
-MYSQL_ROW_OFFSET STDCALL mysql_stmt_row_tell(MYSQL_STMT *stmt);
-MYSQL_ROW_OFFSET STDCALL mysql_stmt_row_seek(MYSQL_STMT *stmt, MYSQL_ROW_OFFSET new_row);
-unsigned long STDCALL mysql_stmt_param_count(MYSQL_STMT *stmt);
-my_bool STDCALL mysql_stmt_send_long_data(MYSQL_STMT *stmt, unsigned int param_number, const char *data, unsigned long length);
-my_ulonglong STDCALL mysql_stmt_insert_id(MYSQL_STMT *stmt);
-my_ulonglong STDCALL mysql_stmt_num_rows(MYSQL_STMT *stmt);
+int STDCALL mysql_stmt_next_result(MYSQL_STMT *stmt);
+my_bool STDCALL mysql_stmt_more_results(MYSQL_STMT *stmt);
