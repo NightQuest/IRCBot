@@ -1,6 +1,6 @@
 #include "preCompiled.h"
 
-MariaDB::Connection::Connection(bool _keepAlive) : conn(nullptr), keepAlive(_keepAlive)
+MariaDB::Connection::Connection(bool _keepAlive) : conn(nullptr), keepAlive(_keepAlive), lastAffectedRows(0L)
 {
 }
 
@@ -22,6 +22,11 @@ std::string MariaDB::Connection::getLastError()
 unsigned int MariaDB::Connection::getLastErrorNo()
 {
 	return mysql_errno(conn);
+}
+
+unsigned long long MariaDB::Connection::getLastAffectedRows()
+{
+	return lastAffectedRows;
 }
 
 bool MariaDB::Connection::escape(std::string& str)
@@ -72,8 +77,8 @@ MariaDB::QueryResult MariaDB::Connection::query(const std::string& str)
 {
 	MYSQL_RES* res = nullptr;
 	MYSQL_FIELD* fields = nullptr;
-	long long rowCount = 0L;
 	unsigned int fieldCount = 0;
+	lastAffectedRows = 0;
 
 	if( mysql_query(conn, str.c_str()) != 0 )
 		return nullptr;
@@ -82,10 +87,10 @@ MariaDB::QueryResult MariaDB::Connection::query(const std::string& str)
 	if( !res )
 		return nullptr;
 
-	rowCount = mysql_affected_rows(conn);
+	lastAffectedRows = mysql_affected_rows(conn);
 	fieldCount = mysql_field_count(conn);
 	fields = mysql_fetch_fields(res);
 
-	QueryResult ret(new QueryResultSet(res, fields, rowCount, fieldCount));
+	QueryResult ret(new QueryResultSet(res, fields, lastAffectedRows, fieldCount));
 	return std::move(ret);
 }

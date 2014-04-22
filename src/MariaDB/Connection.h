@@ -6,6 +6,7 @@ namespace MariaDB
 	{
 	private:
 		MYSQL *conn;
+		unsigned long long lastAffectedRows;
 
 	public:
 		Connection(bool _keepAlive = false);
@@ -16,6 +17,7 @@ namespace MariaDB
 		std::string getClientInfo();
 		std::string getLastError();
 		unsigned int getLastErrorNo();
+		unsigned long long getLastAffectedRows();
 		bool escape(std::string& str);
 		bool open(const std::string& hostname, const std::string& username, const std::string& password = std::string(""), int port = 3306, const std::string& database = std::string(""), int flags = 0);
 		void close();

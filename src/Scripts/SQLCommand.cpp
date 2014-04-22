@@ -72,6 +72,15 @@ public:
 				sSock->sendMessage(messageTarget, ss.str());
 			}
 		}
+		else if( conn->getLastAffectedRows() != 0 )
+		{
+			string args = arguments;
+			transform(args.begin(), args.end(), args.begin(), ::tolower);
+			if( strncmp(args.c_str(), "insert ", 7) == 0 || strncmp(args.c_str(), "update ", 7) == 0 || strncmp(args.c_str(), "delete ", 7) == 0 )
+				sSock->sendMessage(messageTarget, "Affected rows: " + to_string(conn->getLastAffectedRows()));
+			else
+				sSock->sendMessage(messageTarget, "No results");
+		}
 		else
 			sSock->sendMessage(messageTarget, "No results");
 	}
