@@ -90,7 +90,10 @@ public:
 		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
 
 		if( arguments.empty() )
-			sSock->sendMessage(messageTarget, "Please provide a bind");
+		{
+			sSock->sendMessage(messageTarget, "Please provide a bind.");
+			return;
+		}
 
 		string command = arguments;
 		if( internalDB->escape(command) )
@@ -136,10 +139,41 @@ public:
 				stringstream ss;
 				unsigned int replaced = 0;
 				for( size_t x = 0; x < esql.length(); x++ )
-					if( esql[x] == '?' && replaced < tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
+				{
+					if( esql.length() > x && esql[x] == '\\' && esql[x+1] == '?' ) // escape
+						ss << esql[++x];
+
+					else if( esql.length() > x && esql[x] == '?' && esql[x+1] == '-' )
+					{
+						auto emsgs = tmp;
+						emsgs.pop_front();
+						string emessage = Util::implode(emsgs, ' ');
+						if( externalDB->escape(emessage) )
+							ss << emessage;
+						x++;
+					}
+
+					else if( esql.length() > x && esql[x] == '?' && isdigit(esql[x+1]) )
+					{
+						string temp;
+						size_t xx = ++x;
+						for( ; xx < esql.length() && isdigit(esql[xx]); xx++ )
+							temp += esql[xx];
+
+						unsigned long pos = stoul(temp);
+						if( pos > 0 && pos < tmp.size() )
+							ss << tmp[pos];
+					}
+
+					else if( esql[x] == '?' && replaced < tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
+					{
 						ss << tmp[replaced];
+					}
 					else
+					{
 						ss << esql[x];
+					}
+				}
 
 				MariaDB::QueryResult res2 = externalDB->query(ss.str());
 				if( !res2 || res2->getRowCount() == 0 )
