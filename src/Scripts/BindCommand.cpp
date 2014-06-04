@@ -162,7 +162,30 @@ public:
 
 						unsigned long pos = stoul(temp);
 						if( pos > 0 && pos < tmp.size() )
-							ss << tmp[pos];
+						{
+							if( esql.length() >= xx && esql[xx] == '-' )
+							{
+								auto emsgs = tmp;
+								emsgs.pop_front();
+
+								while( --pos )
+									emsgs.pop_front();
+
+								string emessage = Util::implode(emsgs, ' ');
+								if( externalDB->escape(emessage) )
+									ss << emessage;
+								x++;
+							}
+							else
+							{
+								ss << tmp[pos];
+								if( esql.length() > x && esql[x] == '\\' && esql[x+1] == '-' ) // escape
+								{
+									ss << "-";
+									x += 2;
+								}
+							}
+						}
 					}
 
 					else if( esql[x] == '?' && replaced < tmp.size()-1 && externalDB->escape(tmp[++replaced]) )
