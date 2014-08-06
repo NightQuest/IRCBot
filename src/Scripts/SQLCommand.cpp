@@ -81,6 +81,8 @@ public:
 			else
 				sSock->sendMessage(messageTarget, "No results");
 		}
+		else if( conn->getLastErrorNo() )
+			sSock->sendMessage(messageTarget, "Error " + to_string(conn->getLastErrorNo()) + ": " + conn->getLastError());
 		else
 			sSock->sendMessage(messageTarget, "No results");
 	}
