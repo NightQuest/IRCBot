@@ -39,7 +39,7 @@ public:
 					unsigned long long seconds = (*row)["seconds"].getUInt64();
 
 					stringstream ss;
-					ss << arguments << "(" << host << ") was last seen ";
+					ss << arguments << " (" << host << ") was last seen ";
 					
 					if( seconds > YEAR )
 					{
