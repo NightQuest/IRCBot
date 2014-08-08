@@ -27,7 +27,7 @@ public:
 		string nickname = arguments;
 		if( internalDB->escape(nickname) )
 		{
-			MariaDB::QueryResult res = internalDB->query("SELECT (CURRENT_TIMESTAMP - `timestamp`) AS `seconds`, `user` FROM `log` WHERE `user` LIKE '" + nickname + "!%@%' ORDER BY `id` DESC LIMIT 1");
+			MariaDB::QueryResult res = internalDB->query("SELECT (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(`timestamp`)) AS `seconds`, `user` FROM `log` WHERE `user` LIKE '" + nickname + "!%@%' ORDER BY `id` DESC LIMIT 1");
 			if( res && res->getRowCount() == 0 )
 				sSock->sendMessage(messageTarget, "I don't know who " + arguments + " is.");
 			else if( res )
