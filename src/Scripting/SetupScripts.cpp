@@ -10,6 +10,7 @@ void setupSQLCommand();
 void setupTemperatureConversion();
 void setupBindCommand();
 void setupHelpCommand();
+void setupLogger();
 
 void setupScripts()
 {
@@ -23,4 +24,5 @@ void setupScripts()
 	setupTemperatureConversion();
 	setupBindCommand();
 	setupHelpCommand();
+	setupLogger();
 }
