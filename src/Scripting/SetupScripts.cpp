@@ -11,6 +11,7 @@ void setupTemperatureConversion();
 void setupBindCommand();
 void setupHelpCommand();
 void setupLogger();
+void setupSeenCommand();
 
 void setupScripts()
 {
@@ -25,4 +26,5 @@ void setupScripts()
 	setupBindCommand();
 	setupHelpCommand();
 	setupLogger();
+	setupSeenCommand();
 }

@@ -226,6 +226,7 @@
     <ClCompile Include="..\src\Scripts\Logger.cpp" />
     <ClCompile Include="..\src\Scripts\QuitCommand.cpp" />
     <ClCompile Include="..\src\Scripts\SayCommand.cpp" />
+    <ClCompile Include="..\src\Scripts\SeenCommand.cpp" />
     <ClCompile Include="..\src\Scripts\SQLCommand.cpp" />
     <ClCompile Include="..\src\Scripts\TemperatureConversion.cpp" />
     <ClCompile Include="..\src\Util.cpp" />
