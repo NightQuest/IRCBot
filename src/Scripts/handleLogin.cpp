@@ -8,40 +8,48 @@ private:
 public:
 	handleLogin() : IRCScript("handleLogin"), sentUser(false)
 	{
-		sSock->sendLine("USER " + config->getString("irc.name") + " 8 * :" + config->getString("irc.name"));
 		sSock->setNickname(config->getString("irc.nickname"));
+		sSock->sendLine("USER " + config->getString("irc.name") + " 0 * :" + config->getString("irc.name"));
+	}
+
+	void NickServIdentify()
+	{
+		string nickPasses = config->getString("irc.nickpasses");
+		if( !nickPasses.empty() )
+		{
+			auto nicksPass = Util::explode(nickPasses, ' ');
+			if( !nicksPass.empty() )
+			{
+				for( const auto& tmp : nicksPass )
+				{
+					auto passes = Util::explode(tmp, ':');
+					if( passes.size() == 2 && passes[0] == sSock->getNickname() )
+					{
+						sSock->sendMessage("NickServ", "IDENTIFY " + passes[1]);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	void onNotice(const UserPtr& user, const std::string& target, const std::string& message)
 	{
+		//cout << "NOTICE " << user->getNickname() << " -> " << target << ": " << message << endl;
 		if( user->getNickname() == "NickServ" )
 		{
-			if( message.find("NickServ IDENTIFY") != string::npos || message.find("If this is your") != string::npos )
+			string msg = message;
+			transform(message.begin(), message.end(), msg.begin(), ::tolower);
+			if( !config->getBool("irc.alwaysidentify") && (msg.find("nickserv identify") != string::npos || message.find("if this is your") != string::npos) )
 			{
-				string nickPasses = config->getString("irc.nickpasses");
-				if( !nickPasses.empty() )
-				{
-					auto nicksPass = Util::explode(nickPasses, ' ');
-					if( !nicksPass.empty() )
-					{
-						for( const auto& tmp : nicksPass )
-						{
-							auto passes = Util::explode(tmp, ':');
-							if( passes.size() == 2 && passes[0] == sSock->getNickname() )
-							{
-								sSock->sendMessage("NickServ", "IDENTIFY " + passes[1]);
-								break;
-							}
-						}
-					}
-				}
+				NickServIdentify();
 			}
-			else if( message.find("Password accepted") != string::npos || message.find("You are now identified") != string::npos )
+			else if( msg.find("password accepted") != string::npos || msg.find("you are now identified") != string::npos )
 			{
 				if( config->getBool("irc.channels.joinwhenidentified") )
 					sSock->joinChannel(config->getString("irc.channels"));
 			}
-			else if( message.find("Ghost with your nick has been killed") != string::npos )
+			else if( msg.find("ghost with your nick has been killed") != string::npos )
 			{
 				sSock->setNickname(config->getString("irc.nickname"));
 			}
@@ -72,8 +80,9 @@ public:
 				}
 			}
 		}
+		else if( config->getBool("irc.alwaysidentify") )
+			NickServIdentify();
 
-		
 		if( !config->getBool("irc.channels.joinwhenidentified") )
 			sSock->joinChannel(config->getString("irc.channels"));
 	}
