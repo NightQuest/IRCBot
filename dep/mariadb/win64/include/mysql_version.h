@@ -16,9 +16,9 @@
 #define MYSQL_UNIX_ADDR			"/tmp/mysql.sock"
 #define MYSQL_CONFIG_NAME		"my"
 
-#define MARIADB_PACKAGE_VERSION "2.0.0"
+#define MARIADB_PACKAGE_VERSION "2.1.0"
 #define MARIADB_SYSTEM_TYPE "Windows"
-#define MARIADB_MACHINE_TYPE "x86"
+#define MARIADB_MACHINE_TYPE "AMD64"
 
 /* mysqld compile time options */
 #ifndef MYSQL_CHARSET

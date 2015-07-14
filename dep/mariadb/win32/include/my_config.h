@@ -273,6 +273,6 @@
  */
 #define HAVE_THREADS 1
 #define SHAREDIR "share"
-#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-client"
-#define PLUGINDIR "C:/Program Files (x86)/mariadb-client/lib/plugin"
+#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-connector-c"
+#define PLUGINDIR "/lib/plugin"
 
