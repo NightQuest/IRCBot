@@ -103,6 +103,7 @@ EXPORTS
     ASN1_STRING_TABLE_add          @2245; ASN1_STRING_TABLE_add
     ASN1_STRING_TABLE_cleanup      @2020; ASN1_STRING_TABLE_cleanup
     ASN1_STRING_TABLE_get          @2091; ASN1_STRING_TABLE_get
+    ASN1_STRING_clear_free         @2392; ASN1_STRING_clear_free
     ASN1_STRING_cmp                @14  ; ASN1_STRING_cmp
     ASN1_STRING_copy               @4305; ASN1_STRING_copy
     ASN1_STRING_data               @2075; ASN1_STRING_data
@@ -129,6 +130,7 @@ EXPORTS
     ASN1_TBOOLEAN_it               @3167; ASN1_TBOOLEAN_it
     ASN1_TIME_adj                  @4267; ASN1_TIME_adj
     ASN1_TIME_check                @2782; ASN1_TIME_check
+    ASN1_TIME_diff                 @4739; ASN1_TIME_diff
     ASN1_TIME_free                 @1954; ASN1_TIME_free
     ASN1_TIME_it                   @2715; ASN1_TIME_it
     ASN1_TIME_new                  @1973; ASN1_TIME_new
@@ -285,6 +287,7 @@ EXPORTS
     BIO_get_retry_reason           @74  ; BIO_get_retry_reason
     BIO_gethostbyname              @75  ; BIO_gethostbyname
     BIO_gets                       @76  ; BIO_gets
+    BIO_hex_string                 @4764; BIO_hex_string
     BIO_indent                     @3242; BIO_indent
     BIO_int_ctrl                   @53  ; BIO_int_ctrl
     BIO_method_name                @3898; BIO_method_name
@@ -508,6 +511,7 @@ EXPORTS
     BUF_strlcat                    @3241; BUF_strlcat
     BUF_strlcpy                    @3243; BUF_strlcpy
     BUF_strndup                    @3513; BUF_strndup
+    BUF_strnlen                    @4766; BUF_strnlen
     CAST_cbc_encrypt               @992 ; CAST_cbc_encrypt
     CAST_cfb64_encrypt             @993 ; CAST_cfb64_encrypt
     CAST_decrypt                   @990 ; CAST_decrypt
@@ -541,7 +545,18 @@ EXPORTS
     CMS_ReceiptRequest_get0_values @4001; CMS_ReceiptRequest_get0_values
     CMS_ReceiptRequest_it          @4013; CMS_ReceiptRequest_it
     CMS_ReceiptRequest_new         @4018; CMS_ReceiptRequest_new
+    CMS_RecipientEncryptedKey_cert_cmp @4734; CMS_RecipientEncryptedKey_cert_cmp
+    CMS_RecipientEncryptedKey_get0_id @4753; CMS_RecipientEncryptedKey_get0_id
     CMS_RecipientInfo_decrypt      @4037; CMS_RecipientInfo_decrypt
+    CMS_RecipientInfo_encrypt      @4712; CMS_RecipientInfo_encrypt
+    CMS_RecipientInfo_get0_pkey_ctx @4752; CMS_RecipientInfo_get0_pkey_ctx
+    CMS_RecipientInfo_kari_decrypt @4724; CMS_RecipientInfo_kari_decrypt
+    CMS_RecipientInfo_kari_get0_alg @4729; CMS_RecipientInfo_kari_get0_alg
+    CMS_RecipientInfo_kari_get0_ctx @4750; CMS_RecipientInfo_kari_get0_ctx
+    CMS_RecipientInfo_kari_get0_orig_id @4758; CMS_RecipientInfo_kari_get0_orig_id
+    CMS_RecipientInfo_kari_get0_reks @4742; CMS_RecipientInfo_kari_get0_reks
+    CMS_RecipientInfo_kari_orig_id_cmp @4728; CMS_RecipientInfo_kari_orig_id_cmp
+    CMS_RecipientInfo_kari_set0_pkey @4746; CMS_RecipientInfo_kari_set0_pkey
     CMS_RecipientInfo_kekri_get0_id @4011; CMS_RecipientInfo_kekri_get0_id
     CMS_RecipientInfo_kekri_id_cmp @4022; CMS_RecipientInfo_kekri_id_cmp
     CMS_RecipientInfo_ktri_cert_cmp @3962; CMS_RecipientInfo_ktri_cert_cmp
@@ -551,9 +566,13 @@ EXPORTS
     CMS_RecipientInfo_set0_password @4660; CMS_RecipientInfo_set0_password
     CMS_RecipientInfo_set0_pkey    @4043; CMS_RecipientInfo_set0_pkey
     CMS_RecipientInfo_type         @3988; CMS_RecipientInfo_type
+    CMS_SharedInfo_encode          @4756; CMS_SharedInfo_encode
     CMS_SignedData_init            @4010; CMS_SignedData_init
     CMS_SignerInfo_cert_cmp        @3973; CMS_SignerInfo_cert_cmp
     CMS_SignerInfo_get0_algs       @3951; CMS_SignerInfo_get0_algs
+    CMS_SignerInfo_get0_md_ctx     @4744; CMS_SignerInfo_get0_md_ctx
+    CMS_SignerInfo_get0_pkey_ctx   @4725; CMS_SignerInfo_get0_pkey_ctx
+    CMS_SignerInfo_get0_signature  @4741; CMS_SignerInfo_get0_signature
     CMS_SignerInfo_get0_signer_id  @4024; CMS_SignerInfo_get0_signer_id
     CMS_SignerInfo_set1_signer_cert @3999; CMS_SignerInfo_set1_signer_cert
     CMS_SignerInfo_sign            @3974; CMS_SignerInfo_sign
@@ -663,6 +682,8 @@ EXPORTS
     CRL_DIST_POINTS_free           @1539; CRL_DIST_POINTS_free
     CRL_DIST_POINTS_it             @2869; CRL_DIST_POINTS_it
     CRL_DIST_POINTS_new            @1538; CRL_DIST_POINTS_new
+    CRYPTO_128_unwrap              @4722; CRYPTO_128_unwrap
+    CRYPTO_128_wrap                @4720; CRYPTO_128_wrap
     CRYPTO_THREADID_cmp            @4176; CRYPTO_THREADID_cmp
     CRYPTO_THREADID_cpy            @4165; CRYPTO_THREADID_cpy
     CRYPTO_THREADID_current        @4244; CRYPTO_THREADID_current
@@ -820,14 +841,19 @@ EXPORTS
     DES_string_to_2keys            @810 ; DES_string_to_2keys
     DES_string_to_key              @811 ; DES_string_to_key
     DES_xcbc_encrypt               @812 ; DES_xcbc_encrypt
+    DH_KDF_X9_42                   @4735; DH_KDF_X9_42
     DH_OpenSSL                     @1890; DH_OpenSSL
     DH_check                       @200 ; DH_check
     DH_check_pub_key               @3774; DH_check_pub_key
     DH_compute_key                 @201 ; DH_compute_key
+    DH_compute_key_padded          @4732; DH_compute_key_padded
     DH_free                        @202 ; DH_free
     DH_generate_key                @203 ; DH_generate_key
     DH_generate_parameters         @204 ; DH_generate_parameters
     DH_generate_parameters_ex      @3713; DH_generate_parameters_ex
+    DH_get_1024_160                @4685; DH_get_1024_160
+    DH_get_2048_224                @4691; DH_get_2048_224
+    DH_get_2048_256                @4689; DH_get_2048_256
     DH_get_default_method          @1892; DH_get_default_method
     DH_get_ex_data                 @1886; DH_get_ex_data
     DH_get_ex_new_index            @1887; DH_get_ex_new_index
@@ -910,6 +936,7 @@ EXPORTS
     DSO_set_method                 @2267; DSO_set_method
     DSO_set_name_converter         @3105; DSO_set_name_converter
     DSO_up_ref                     @2843; DSO_up_ref
+    ECDH_KDF_X9_62                 @4749; ECDH_KDF_X9_62
     ECDH_OpenSSL                   @3442; ECDH_OpenSSL
     ECDH_compute_key               @3644; ECDH_compute_key
     ECDH_get_default_method        @3351; ECDH_get_default_method
@@ -918,6 +945,15 @@ EXPORTS
     ECDH_set_default_method        @3549; ECDH_set_default_method
     ECDH_set_ex_data               @3613; ECDH_set_ex_data
     ECDH_set_method                @3611; ECDH_set_method
+    ECDSA_METHOD_free              @4759; ECDSA_METHOD_free
+    ECDSA_METHOD_get_app_data      @4770; ECDSA_METHOD_get_app_data
+    ECDSA_METHOD_new               @4751; ECDSA_METHOD_new
+    ECDSA_METHOD_set_app_data      @4768; ECDSA_METHOD_set_app_data
+    ECDSA_METHOD_set_flags         @4726; ECDSA_METHOD_set_flags
+    ECDSA_METHOD_set_name          @4723; ECDSA_METHOD_set_name
+    ECDSA_METHOD_set_sign          @4733; ECDSA_METHOD_set_sign
+    ECDSA_METHOD_set_sign_setup    @4727; ECDSA_METHOD_set_sign_setup
+    ECDSA_METHOD_set_verify        @4755; ECDSA_METHOD_set_verify
     ECDSA_OpenSSL                  @3620; ECDSA_OpenSSL
     ECDSA_SIG_free                 @3455; ECDSA_SIG_free
     ECDSA_SIG_new                  @3395; ECDSA_SIG_new
@@ -959,6 +995,7 @@ EXPORTS
     EC_GROUP_get_curve_GFp         @2985; EC_GROUP_get_curve_GFp
     EC_GROUP_get_curve_name        @3695; EC_GROUP_get_curve_name
     EC_GROUP_get_degree            @3570; EC_GROUP_get_degree
+    EC_GROUP_get_mont_data         @4772; EC_GROUP_get_mont_data
     EC_GROUP_get_order             @2701; EC_GROUP_get_order
     EC_GROUP_get_pentanomial_basis @3409; EC_GROUP_get_pentanomial_basis
     EC_GROUP_get_point_conversion_form @3405; EC_GROUP_get_point_conversion_form
@@ -1038,6 +1075,8 @@ EXPORTS
     EC_POINT_set_to_infinity       @3176; EC_POINT_set_to_infinity
     EC_POINTs_make_affine          @2830; EC_POINTs_make_affine
     EC_POINTs_mul                  @2940; EC_POINTs_mul
+    EC_curve_nid2nist              @4688; EC_curve_nid2nist
+    EC_curve_nist2nid              @4684; EC_curve_nist2nid
     EC_get_builtin_curves          @3447; EC_get_builtin_curves
     EDIPARTYNAME_free              @2883; EDIPARTYNAME_free
     EDIPARTYNAME_it                @3005; EDIPARTYNAME_it
@@ -1105,7 +1144,6 @@ EXPORTS
     ENGINE_load_private_key        @2498; ENGINE_load_private_key
     ENGINE_load_public_key         @2479; ENGINE_load_public_key
     ENGINE_load_rdrand             @4640; ENGINE_load_rdrand
-    ENGINE_load_rsax               @4652; ENGINE_load_rsax
     ENGINE_load_ssl_client_cert    @4046; ENGINE_load_ssl_client_cert
     ENGINE_new                     @2515; ENGINE_new
     ENGINE_pkey_asn1_find_str      @4282; ENGINE_pkey_asn1_find_str
@@ -1383,6 +1421,7 @@ EXPORTS
     EVP_PKEY_asn1_new              @4152; EVP_PKEY_asn1_new
     EVP_PKEY_asn1_set_ctrl         @4530; EVP_PKEY_asn1_set_ctrl
     EVP_PKEY_asn1_set_free         @4178; EVP_PKEY_asn1_set_free
+    EVP_PKEY_asn1_set_item         @4774; EVP_PKEY_asn1_set_item
     EVP_PKEY_asn1_set_param        @4361; EVP_PKEY_asn1_set_param
     EVP_PKEY_asn1_set_private      @4308; EVP_PKEY_asn1_set_private
     EVP_PKEY_asn1_set_public       @4171; EVP_PKEY_asn1_set_public
@@ -1469,6 +1508,7 @@ EXPORTS
     EVP_add_digest                 @293 ; EVP_add_digest
     EVP_aes_128_cbc                @2927; EVP_aes_128_cbc
     EVP_aes_128_cbc_hmac_sha1      @4637; EVP_aes_128_cbc_hmac_sha1
+    EVP_aes_128_cbc_hmac_sha256    @4731; EVP_aes_128_cbc_hmac_sha256
     EVP_aes_128_ccm                @4609; EVP_aes_128_ccm
     EVP_aes_128_cfb1               @3251; EVP_aes_128_cfb1
     EVP_aes_128_cfb128             @3222; EVP_aes_128_cfb128
@@ -1477,6 +1517,7 @@ EXPORTS
     EVP_aes_128_ecb                @2644; EVP_aes_128_ecb
     EVP_aes_128_gcm                @4601; EVP_aes_128_gcm
     EVP_aes_128_ofb                @3224; EVP_aes_128_ofb
+    EVP_aes_128_wrap               @4743; EVP_aes_128_wrap
     EVP_aes_128_xts                @4595; EVP_aes_128_xts
     EVP_aes_192_cbc                @3155; EVP_aes_192_cbc
     EVP_aes_192_ccm                @4617; EVP_aes_192_ccm
@@ -1487,8 +1528,10 @@ EXPORTS
     EVP_aes_192_ecb                @2862; EVP_aes_192_ecb
     EVP_aes_192_gcm                @4611; EVP_aes_192_gcm
     EVP_aes_192_ofb                @3221; EVP_aes_192_ofb
+    EVP_aes_192_wrap               @4730; EVP_aes_192_wrap
     EVP_aes_256_cbc                @2996; EVP_aes_256_cbc
     EVP_aes_256_cbc_hmac_sha1      @4656; EVP_aes_256_cbc_hmac_sha1
+    EVP_aes_256_cbc_hmac_sha256    @4740; EVP_aes_256_cbc_hmac_sha256
     EVP_aes_256_ccm                @4605; EVP_aes_256_ccm
     EVP_aes_256_cfb1               @3271; EVP_aes_256_cfb1
     EVP_aes_256_cfb128             @3223; EVP_aes_256_cfb128
@@ -1497,6 +1540,7 @@ EXPORTS
     EVP_aes_256_ecb                @2720; EVP_aes_256_ecb
     EVP_aes_256_gcm                @4615; EVP_aes_256_gcm
     EVP_aes_256_ofb                @3220; EVP_aes_256_ofb
+    EVP_aes_256_wrap               @4719; EVP_aes_256_wrap
     EVP_aes_256_xts                @4599; EVP_aes_256_xts
     EVP_bf_cbc                     @294 ; EVP_bf_cbc
     EVP_bf_cfb64                   @295 ; EVP_bf_cfb64
@@ -1538,6 +1582,7 @@ EXPORTS
     EVP_des_ede3_cfb8              @3258; EVP_des_ede3_cfb8
     EVP_des_ede3_ecb               @3236; EVP_des_ede3_ecb
     EVP_des_ede3_ofb               @306 ; EVP_des_ede3_ofb
+    EVP_des_ede3_wrap              @4737; EVP_des_ede3_wrap
     EVP_des_ede_cbc                @307 ; EVP_des_ede_cbc
     EVP_des_ede_cfb64              @308 ; EVP_des_ede_cfb64
     EVP_des_ede_ecb                @3231; EVP_des_ede_ecb
@@ -1785,6 +1830,12 @@ EXPORTS
     OCSP_REQUEST_print             @2981; OCSP_REQUEST_print
     OCSP_REQ_CTX_add1_header       @4541; OCSP_REQ_CTX_add1_header
     OCSP_REQ_CTX_free              @3921; OCSP_REQ_CTX_free
+    OCSP_REQ_CTX_get0_mem_bio      @4709; OCSP_REQ_CTX_get0_mem_bio
+    OCSP_REQ_CTX_http              @4713; OCSP_REQ_CTX_http
+    OCSP_REQ_CTX_i2d               @4708; OCSP_REQ_CTX_i2d
+    OCSP_REQ_CTX_nbio              @4714; OCSP_REQ_CTX_nbio
+    OCSP_REQ_CTX_nbio_d2i          @4718; OCSP_REQ_CTX_nbio_d2i
+    OCSP_REQ_CTX_new               @4717; OCSP_REQ_CTX_new
     OCSP_REQ_CTX_set1_req          @4542; OCSP_REQ_CTX_set1_req
     OCSP_RESPBYTES_free            @2926; OCSP_RESPBYTES_free
     OCSP_RESPBYTES_it              @2811; OCSP_RESPBYTES_it
@@ -1860,6 +1911,7 @@ EXPORTS
     OCSP_sendreq_bio               @2551; OCSP_sendreq_bio
     OCSP_sendreq_nbio              @3923; OCSP_sendreq_nbio
     OCSP_sendreq_new               @3924; OCSP_sendreq_new
+    OCSP_set_max_response_length   @4716; OCSP_set_max_response_length
     OCSP_single_get0_status        @2989; OCSP_single_get0_status
     OCSP_url_svcloc_new            @2973; OCSP_url_svcloc_new
     OPENSSL_DIR_end                @3396; OPENSSL_DIR_end
@@ -1872,6 +1924,7 @@ EXPORTS
     OPENSSL_cpuid_setup            @4675; OPENSSL_cpuid_setup
     OPENSSL_gmtime                 @4567; OPENSSL_gmtime
     OPENSSL_gmtime_adj             @4568; OPENSSL_gmtime_adj
+    OPENSSL_gmtime_diff            @4745; OPENSSL_gmtime_diff
     OPENSSL_ia32cap_loc            @3467; OPENSSL_ia32cap_loc
     OPENSSL_init                   @4091; OPENSSL_init
     OPENSSL_isservice              @4048; OPENSSL_isservice
@@ -1971,6 +2024,7 @@ EXPORTS
     PEM_write                      @404 ; PEM_write
     PEM_write_CMS                  @3939; PEM_write_CMS
     PEM_write_DHparams             @405 ; PEM_write_DHparams
+    PEM_write_DHxparams            @4686; PEM_write_DHxparams
     PEM_write_DSAPrivateKey        @406 ; PEM_write_DSAPrivateKey
     PEM_write_DSA_PUBKEY           @2101; PEM_write_DSA_PUBKEY
     PEM_write_DSAparams            @407 ; PEM_write_DSAparams
@@ -1999,6 +2053,7 @@ EXPORTS
     PEM_write_bio_CMS              @3960; PEM_write_bio_CMS
     PEM_write_bio_CMS_stream       @4466; PEM_write_bio_CMS_stream
     PEM_write_bio_DHparams         @415 ; PEM_write_bio_DHparams
+    PEM_write_bio_DHxparams        @4690; PEM_write_bio_DHxparams
     PEM_write_bio_DSAPrivateKey    @416 ; PEM_write_bio_DSAPrivateKey
     PEM_write_bio_DSA_PUBKEY       @1968; PEM_write_bio_DSA_PUBKEY
     PEM_write_bio_DSAparams        @417 ; PEM_write_bio_DSAparams
@@ -2240,6 +2295,9 @@ EXPORTS
     RSAPrivateKey_it               @2906; RSAPrivateKey_it
     RSAPublicKey_dup               @482 ; RSAPublicKey_dup
     RSAPublicKey_it                @2737; RSAPublicKey_it
+    RSA_OAEP_PARAMS_free           @4736; RSA_OAEP_PARAMS_free
+    RSA_OAEP_PARAMS_it             @4738; RSA_OAEP_PARAMS_it
+    RSA_OAEP_PARAMS_new            @4721; RSA_OAEP_PARAMS_new
     RSA_PKCS1_SSLeay               @483 ; RSA_PKCS1_SSLeay
     RSA_PSS_PARAMS_free            @4668; RSA_PSS_PARAMS_free
     RSA_PSS_PARAMS_it              @4667; RSA_PSS_PARAMS_it
@@ -2261,6 +2319,7 @@ EXPORTS
     RSA_new_method                 @487 ; RSA_new_method
     RSA_null_method                @1904; RSA_null_method
     RSA_padding_add_PKCS1_OAEP     @1226; RSA_padding_add_PKCS1_OAEP
+    RSA_padding_add_PKCS1_OAEP_mgf1 @4757; RSA_padding_add_PKCS1_OAEP_mgf1
     RSA_padding_add_PKCS1_PSS      @3323; RSA_padding_add_PKCS1_PSS
     RSA_padding_add_PKCS1_PSS_mgf1 @4594; RSA_padding_add_PKCS1_PSS_mgf1
     RSA_padding_add_PKCS1_type_1   @1031; RSA_padding_add_PKCS1_type_1
@@ -2269,6 +2328,7 @@ EXPORTS
     RSA_padding_add_X931           @3322; RSA_padding_add_X931
     RSA_padding_add_none           @1034; RSA_padding_add_none
     RSA_padding_check_PKCS1_OAEP   @1227; RSA_padding_check_PKCS1_OAEP
+    RSA_padding_check_PKCS1_OAEP_mgf1 @4754; RSA_padding_check_PKCS1_OAEP_mgf1
     RSA_padding_check_PKCS1_type_1 @1035; RSA_padding_check_PKCS1_type_1
     RSA_padding_check_PKCS1_type_2 @1036; RSA_padding_check_PKCS1_type_2
     RSA_padding_check_SSLv23       @1037; RSA_padding_check_SSLv23
@@ -2583,6 +2643,7 @@ EXPORTS
     X509V3_EXT_conf                @1176; X509V3_EXT_conf
     X509V3_EXT_conf_nid            @1177; X509V3_EXT_conf_nid
     X509V3_EXT_d2i                 @1238; X509V3_EXT_d2i
+    X509V3_EXT_free                @4763; X509V3_EXT_free
     X509V3_EXT_get                 @1178; X509V3_EXT_get
     X509V3_EXT_get_nid             @1179; X509V3_EXT_get_nid
     X509V3_EXT_i2d                 @1646; X509V3_EXT_i2d
@@ -2613,6 +2674,7 @@ EXPORTS
     X509V3_set_nconf               @2695; X509V3_set_nconf
     X509V3_string_free             @1506; X509V3_string_free
     X509_ALGORS_it                 @3926; X509_ALGORS_it
+    X509_ALGOR_cmp                 @2398; X509_ALGOR_cmp
     X509_ALGOR_dup                 @1518; X509_ALGOR_dup
     X509_ALGOR_free                @517 ; X509_ALGOR_free
     X509_ALGOR_get0                @3927; X509_ALGOR_get0
@@ -2652,8 +2714,10 @@ EXPORTS
     X509_CRL_add0_revoked          @3004; X509_CRL_add0_revoked
     X509_CRL_add1_ext_i2d          @2834; X509_CRL_add1_ext_i2d
     X509_CRL_add_ext               @525 ; X509_CRL_add_ext
+    X509_CRL_check_suiteb          @4695; X509_CRL_check_suiteb
     X509_CRL_cmp                   @526 ; X509_CRL_cmp
     X509_CRL_delete_ext            @527 ; X509_CRL_delete_ext
+    X509_CRL_diff                  @4706; X509_CRL_diff
     X509_CRL_digest                @2391; X509_CRL_digest
     X509_CRL_dup                   @528 ; X509_CRL_dup
     X509_CRL_free                  @529 ; X509_CRL_free
@@ -2666,6 +2730,7 @@ EXPORTS
     X509_CRL_get_ext_count         @534 ; X509_CRL_get_ext_count
     X509_CRL_get_ext_d2i           @2009; X509_CRL_get_ext_d2i
     X509_CRL_get_meth_data         @4324; X509_CRL_get_meth_data
+    X509_CRL_http_nbio             @4707; X509_CRL_http_nbio
     X509_CRL_it                    @2555; X509_CRL_it
     X509_CRL_match                 @4307; X509_CRL_match
     X509_CRL_new                   @535 ; X509_CRL_new
@@ -2807,6 +2872,7 @@ EXPORTS
     X509_REVOKED_add1_ext_i2d      @3087; X509_REVOKED_add1_ext_i2d
     X509_REVOKED_add_ext           @611 ; X509_REVOKED_add_ext
     X509_REVOKED_delete_ext        @612 ; X509_REVOKED_delete_ext
+    X509_REVOKED_dup               @4711; X509_REVOKED_dup
     X509_REVOKED_free              @613 ; X509_REVOKED_free
     X509_REVOKED_get_ext           @614 ; X509_REVOKED_get_ext
     X509_REVOKED_get_ext_by_NID    @615 ; X509_REVOKED_get_ext_by_NID
@@ -2828,6 +2894,7 @@ EXPORTS
     X509_STORE_CTX_get0_param      @3505; X509_STORE_CTX_get0_param
     X509_STORE_CTX_get0_parent_ctx @4545; X509_STORE_CTX_get0_parent_ctx
     X509_STORE_CTX_get0_policy_tree @3748; X509_STORE_CTX_get0_policy_tree
+    X509_STORE_CTX_get0_store      @4710; X509_STORE_CTX_get0_store
     X509_STORE_CTX_get1_chain      @2204; X509_STORE_CTX_get1_chain
     X509_STORE_CTX_get1_issuer     @2448; X509_STORE_CTX_get1_issuer
     X509_STORE_CTX_get_chain       @1014; X509_STORE_CTX_get_chain
@@ -2867,6 +2934,7 @@ EXPORTS
     X509_STORE_set_default_paths   @630 ; X509_STORE_set_default_paths
     X509_STORE_set_depth           @3508; X509_STORE_set_depth
     X509_STORE_set_flags           @2596; X509_STORE_set_flags
+    X509_STORE_set_lookup_crls_cb  @4705; X509_STORE_set_lookup_crls_cb
     X509_STORE_set_purpose         @2559; X509_STORE_set_purpose
     X509_STORE_set_trust           @2586; X509_STORE_set_trust
     X509_STORE_set_verify_cb       @4543; X509_STORE_set_verify_cb
@@ -2885,18 +2953,28 @@ EXPORTS
     X509_VAL_new                   @632 ; X509_VAL_new
     X509_VERIFY_PARAM_add0_policy  @3652; X509_VERIFY_PARAM_add0_policy
     X509_VERIFY_PARAM_add0_table   @3703; X509_VERIFY_PARAM_add0_table
+    X509_VERIFY_PARAM_add1_host    @4771; X509_VERIFY_PARAM_add1_host
     X509_VERIFY_PARAM_clear_flags  @3772; X509_VERIFY_PARAM_clear_flags
     X509_VERIFY_PARAM_free         @3527; X509_VERIFY_PARAM_free
+    X509_VERIFY_PARAM_get0         @4762; X509_VERIFY_PARAM_get0
+    X509_VERIFY_PARAM_get0_name    @4761; X509_VERIFY_PARAM_get0_name
+    X509_VERIFY_PARAM_get0_peername @4767; X509_VERIFY_PARAM_get0_peername
+    X509_VERIFY_PARAM_get_count    @4760; X509_VERIFY_PARAM_get_count
     X509_VERIFY_PARAM_get_depth    @3559; X509_VERIFY_PARAM_get_depth
     X509_VERIFY_PARAM_get_flags    @3781; X509_VERIFY_PARAM_get_flags
     X509_VERIFY_PARAM_inherit      @3378; X509_VERIFY_PARAM_inherit
     X509_VERIFY_PARAM_lookup       @3659; X509_VERIFY_PARAM_lookup
     X509_VERIFY_PARAM_new          @3437; X509_VERIFY_PARAM_new
     X509_VERIFY_PARAM_set1         @3610; X509_VERIFY_PARAM_set1
+    X509_VERIFY_PARAM_set1_email   @4696; X509_VERIFY_PARAM_set1_email
+    X509_VERIFY_PARAM_set1_host    @4702; X509_VERIFY_PARAM_set1_host
+    X509_VERIFY_PARAM_set1_ip      @4703; X509_VERIFY_PARAM_set1_ip
+    X509_VERIFY_PARAM_set1_ip_asc  @4694; X509_VERIFY_PARAM_set1_ip_asc
     X509_VERIFY_PARAM_set1_name    @3413; X509_VERIFY_PARAM_set1_name
     X509_VERIFY_PARAM_set1_policies @3412; X509_VERIFY_PARAM_set1_policies
     X509_VERIFY_PARAM_set_depth    @3399; X509_VERIFY_PARAM_set_depth
     X509_VERIFY_PARAM_set_flags    @3421; X509_VERIFY_PARAM_set_flags
+    X509_VERIFY_PARAM_set_hostflags @4765; X509_VERIFY_PARAM_set_hostflags
     X509_VERIFY_PARAM_set_purpose  @3414; X509_VERIFY_PARAM_set_purpose
     X509_VERIFY_PARAM_set_time     @3757; X509_VERIFY_PARAM_set_time
     X509_VERIFY_PARAM_set_trust    @3495; X509_VERIFY_PARAM_set_trust
@@ -2908,8 +2986,14 @@ EXPORTS
     X509_alias_get0                @2074; X509_alias_get0
     X509_alias_set1                @1933; X509_alias_set1
     X509_certificate_type          @635 ; X509_certificate_type
+    X509_chain_check_suiteb        @4692; X509_chain_check_suiteb
+    X509_chain_up_ref              @4693; X509_chain_up_ref
     X509_check_akid                @4496; X509_check_akid
     X509_check_ca                  @3286; X509_check_ca
+    X509_check_email               @4697; X509_check_email
+    X509_check_host                @4698; X509_check_host
+    X509_check_ip                  @4704; X509_check_ip
+    X509_check_ip_asc              @4699; X509_check_ip_asc
     X509_check_issued              @2454; X509_check_issued
     X509_check_private_key         @636 ; X509_check_private_key
     X509_check_purpose             @2051; X509_check_purpose
@@ -2925,6 +3009,7 @@ EXPORTS
     X509_find_by_subject           @921 ; X509_find_by_subject
     X509_free                      @641 ; X509_free
     X509_get0_pubkey_bitstr        @2662; X509_get0_pubkey_bitstr
+    X509_get0_signature            @4700; X509_get0_signature
     X509_get1_email                @2404; X509_get1_email
     X509_get1_ocsp                 @3920; X509_get1_ocsp
     X509_get_default_cert_area     @642 ; X509_get_default_cert_area
@@ -2945,8 +3030,10 @@ EXPORTS
     X509_get_pubkey                @654 ; X509_get_pubkey
     X509_get_pubkey_parameters     @655 ; X509_get_pubkey_parameters
     X509_get_serialNumber          @656 ; X509_get_serialNumber
+    X509_get_signature_nid         @4701; X509_get_signature_nid
     X509_get_subject_name          @657 ; X509_get_subject_name
     X509_gmtime_adj                @658 ; X509_gmtime_adj
+    X509_http_nbio                 @4715; X509_http_nbio
     X509_issuer_and_serial_cmp     @659 ; X509_issuer_and_serial_cmp
     X509_issuer_and_serial_hash    @660 ; X509_issuer_and_serial_hash
     X509_issuer_name_cmp           @661 ; X509_issuer_name_cmp
@@ -3135,6 +3222,7 @@ EXPORTS
     d2i_CMS_bio                    @3946; d2i_CMS_bio
     d2i_CRL_DIST_POINTS            @1540; d2i_CRL_DIST_POINTS
     d2i_DHparams                   @727 ; d2i_DHparams
+    d2i_DHxparams                  @4687; d2i_DHxparams
     d2i_DIRECTORYSTRING            @1344; d2i_DIRECTORYSTRING
     d2i_DISPLAYTEXT                @1346; d2i_DISPLAYTEXT
     d2i_DIST_POINT                 @1543; d2i_DIST_POINT
@@ -3245,6 +3333,7 @@ EXPORTS
     d2i_RSAPublicKey_bio           @945 ; d2i_RSAPublicKey_bio
     d2i_RSAPublicKey_fp            @952 ; d2i_RSAPublicKey_fp
     d2i_RSA_NET                    @2408; d2i_RSA_NET
+    d2i_RSA_OAEP_PARAMS            @4748; d2i_RSA_OAEP_PARAMS
     d2i_RSA_PSS_PARAMS             @4666; d2i_RSA_PSS_PARAMS
     d2i_RSA_PUBKEY                 @2044; d2i_RSA_PUBKEY
     d2i_RSA_PUBKEY_bio             @2053; d2i_RSA_PUBKEY_bio
@@ -3348,6 +3437,7 @@ EXPORTS
     i2d_CMS_bio_stream             @4208; i2d_CMS_bio_stream
     i2d_CRL_DIST_POINTS            @1537; i2d_CRL_DIST_POINTS
     i2d_DHparams                   @830 ; i2d_DHparams
+    i2d_DHxparams                  @4683; i2d_DHxparams
     i2d_DIRECTORYSTRING            @1343; i2d_DIRECTORYSTRING
     i2d_DISPLAYTEXT                @1345; i2d_DISPLAYTEXT
     i2d_DIST_POINT                 @1541; i2d_DIST_POINT
@@ -3464,6 +3554,7 @@ EXPORTS
     i2d_RSAPublicKey_bio           @946 ; i2d_RSAPublicKey_bio
     i2d_RSAPublicKey_fp            @954 ; i2d_RSAPublicKey_fp
     i2d_RSA_NET                    @2406; i2d_RSA_NET
+    i2d_RSA_OAEP_PARAMS            @4747; i2d_RSA_OAEP_PARAMS
     i2d_RSA_PSS_PARAMS             @4670; i2d_RSA_PSS_PARAMS
     i2d_RSA_PUBKEY                 @1974; i2d_RSA_PUBKEY
     i2d_RSA_PUBKEY_bio             @1985; i2d_RSA_PUBKEY_bio
@@ -3512,6 +3603,7 @@ EXPORTS
     i2d_X509_VAL                   @876 ; i2d_X509_VAL
     i2d_X509_bio                   @877 ; i2d_X509_bio
     i2d_X509_fp                    @878 ; i2d_X509_fp
+    i2d_re_X509_tbs                @4773; i2d_re_X509_tbs
     i2o_ECPublicKey                @3373; i2o_ECPublicKey
     i2s_ASN1_ENUMERATED            @1241; i2s_ASN1_ENUMERATED
     i2s_ASN1_ENUMERATED_TABLE      @1242; i2s_ASN1_ENUMERATED_TABLE
@@ -3563,6 +3655,7 @@ EXPORTS
     private_RC4_set_key            @3294; private_RC4_set_key
     s2i_ASN1_INTEGER               @1509; s2i_ASN1_INTEGER
     s2i_ASN1_OCTET_STRING          @1221; s2i_ASN1_OCTET_STRING
+    sk_deep_copy                   @4769; sk_deep_copy
     sk_delete                      @901 ; sk_delete
     sk_delete_ptr                  @902 ; sk_delete_ptr
     sk_dup                         @903 ; sk_dup
