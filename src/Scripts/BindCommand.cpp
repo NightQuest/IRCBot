@@ -9,7 +9,8 @@ public:
 	{
 		ChatCommand commands[] = {
 			{ "bind", "Binds SQL to a command", handleBindCommand, ACCESS_BIND, vector<ChatCommand>() },
-			{ "unbind", "Unbinds SQL from a command", handleUnbindCommand, ACCESS_BIND, vector<ChatCommand>() }
+			{ "unbind", "Unbinds SQL from a command", handleUnbindCommand, ACCESS_BIND, vector<ChatCommand>() },
+			{ "binds", "Lists binds that are available to you", handleListBindsCommand, ACCESS_NONE, vector<ChatCommand>() }
 		};
 
 		return vector<ChatCommand>(begin(commands), end(commands));
@@ -109,6 +110,42 @@ public:
 					sSock->sendMessage(messageTarget, "Could not successfully unbind.");
 			}
 		}
+	}
+
+	static void handleListBindsCommand(const UserPtr& user, const std::string& target, const std::string& arguments)
+	{
+		if( !internalDB )
+			return;
+
+		string messageTarget = (target == sSock->getNickname()) ? user->getNickname() : target;
+
+		MariaDB::QueryResult res = internalDB->query(
+			"SELECT "
+			"	GROUP_CONCAT(`bind` SEPARATOR ', ') "
+			"FROM "
+			"	(SELECT "
+			"		(SELECT "
+			"			`access` "
+			"		FROM "
+			"			`perms` "
+			"		WHERE "
+			"			`user` = '" + user->getFullAddress() + "') AS `access`, "
+			"		`bind`, "
+			"		`required_access` "
+			"	FROM "
+			"		`binds` AS `b` "
+			"	HAVING "
+			"		`b`.`required_access` = 0 "
+			"	OR "
+			"		(`b`.`required_access` & `access`) = `b`.`required_access`) AS `a`");
+		if( res && res->getRowCount() != 0 )
+		{
+			MariaDB::QueryRow* row;
+			if( res->nextRow() && (row = res->getRow()) )
+				sSock->sendMessage(messageTarget, (*row)[0].getString());
+		}
+		else
+			sSock->sendMessage(messageTarget, "You don't have access to any binds.");
 	}
 
 	void onChatText(const UserPtr& user, const std::string& target, const std::string& message)
